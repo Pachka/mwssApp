@@ -388,24 +388,22 @@ server <- function(input, output, session) {
                     options = list(max = pNI))
   })
 
-
-
   observeEvent(input$W_pFI, {
     isolate({
     pop <- data$str %>% .[.$Ward == input$IMMPWard,"P"]
+
     pFI <- input$W_pFI
     pPI <- input$W_pPI
-    pNI <- pop - input$W_pFI - input$W_pPI
+    pNIup <- pop - input$W_pFI - input$W_pPI
 
-    print(c(
-      pop = pop, pFI = pFI, pPI = pPI, pNI = pNI))
+    print(c( pop = pop, pFI = pFI, pPI = pPI, pNI = pNIup))
 
     updateKnobInput(session, 'W_pPI',
                     options = list(max = pop - pFI))
 
     updateKnobInput(session, 'W_pNI',
-                    value = pNI,
-                    options = list(max = pNI))
+                    value = pNIup,
+                    options = list(max = pNIup))
     })
   })
 
@@ -471,6 +469,7 @@ server <- function(input, output, session) {
              href = NULL)
   })
 
+
   observeEvent(input$immuStatP, {
     if(input$immuStatP == "NL" & length(data$str$Ward) > 0){
 
@@ -482,17 +481,24 @@ server <- function(input, output, session) {
         ward = data$str$Ward,
         imm = c("NI","PI","FI"))
 
-      IMMstateP <- lapply(data$str$Ward,  function(W){
-        IMMstateP[IMMstateP$ward == W, "n"] <-  data$str[data$str$Ward == W, "P"]
-        IMMstateP[IMMstateP$ward == W,] }) %>% do.call(rbind, .)
+      IMMstateP %<>%  merge(., data$str[, c("Ward", "P")], all = T, by.x = "ward", by.y = "Ward")
 
       setDT(IMMstateP)
 
-      IMMstateP[imm == "NI", n := ceiling(n * pNI - 0.5)]
-      IMMstateP[imm == "PI", n := ceiling(n * pPI - 0.5)]
-      IMMstateP[imm == "FI", n := ceiling(n * pFI - 0.5)]
-      IMMstateP[, pop := "p"]
+      apply(data$str, 1, function(W){
 
+        nP <- sample(c("NI", "PI", "FI"), W["P"], prob = c(pNI, pPI, pFI), replace = T) %>% table
+
+        if("NI" %in% names(nP))
+          IMMstateP[ward == W["Ward"] & imm == "NI", n := nP[["NI"]]]
+        if("PI" %in% names(nP))
+          IMMstateP[ward == W["Ward"] & imm == "PI", n := nP[["PI"]]]
+        if("FI" %in% names(nP))
+          IMMstateP[ward == W["Ward"] & imm == "FI", n := nP[["FI"]]]
+        IMMstateP[, pop := "p"]
+      })
+
+      IMMstateP[, P:=NULL]
 
       data$IMMstate <- rbind(data$IMMstate[pop != "p",], IMMstateP)
       data$IMMstate %<>% .[.$n != 0, ]
@@ -519,8 +525,6 @@ server <- function(input, output, session) {
     )
   })
 
-
-
   output$updated_pNI_ML <- renderUI({
     pNI <- 100 - input$pFI - input$pPI
 
@@ -531,24 +535,36 @@ server <- function(input, output, session) {
 
   observeEvent(input$updateimmuStatPML, {
 
+    pNI <- (100 - input$pFI - input$pPI)/100
+    pPI <- (input$pPI / 100)
+    pFI <- (input$pFI / 100)
+
     IMMstateP <- expand.grid(
       ward = data$str$Ward,
       imm = c("NI","PI","FI"))
 
-    IMMstateP <- lapply(data$str$Ward,  function(W){
-      IMMstateP[IMMstateP$ward == W, "n"] <-  data$str[data$str$Ward == W, "P"]
-      IMMstateP[IMMstateP$ward == W,] }) %>% do.call(rbind, .)
+    IMMstateP %<>%  merge(., data$str[, c("Ward", "P")], all = T, by.x = "ward", by.y = "Ward")
 
     setDT(IMMstateP)
 
-    IMMstateP[imm == "NI", n := ceiling(n * ((100 - input$pFI - input$pPI)/100) - 0.5)]
-    IMMstateP[imm == "PI", n := ceiling(n * (input$pPI / 100) - 0.5)]
-    IMMstateP[imm == "FI", n := ceiling(n * (input$pFI / 100) - 0.5)]
-    IMMstateP[, pop := "p"]
+    apply(data$str, 1, function(W){
 
+      nP <- sample(c("NI", "PI", "FI"), W["P"], prob = c(pNI, pPI, pFI), replace = T) %>% table
+
+      if("NI" %in% names(nP))
+        IMMstateP[ward == W["Ward"] & imm == "NI", n := nP[["NI"]]]
+      if("PI" %in% names(nP))
+        IMMstateP[ward == W["Ward"] & imm == "PI", n := nP[["PI"]]]
+      if("FI" %in% names(nP))
+        IMMstateP[ward == W["Ward"] & imm == "FI", n := nP[["FI"]]]
+      IMMstateP[, pop := "p"]
+    })
+
+    IMMstateP[, P:=NULL]
 
     data$IMMstate <- rbind(data$IMMstate[pop != "p",], IMMstateP)
     data$IMMstate %<>% .[.$n != 0, ]
+
   })
 
 
@@ -557,7 +573,6 @@ server <- function(input, output, session) {
   ####
 
   ####### Generic prop
-
 
   observeEvent(input$immuStatH, {
     if(input$immuStatH == "NL" & length(data$str$Ward) > 0){
@@ -570,22 +585,104 @@ server <- function(input, output, session) {
         ward = data$str$Ward,
         imm = c("NI","PI","FI"))
 
-      IMMstateH <- lapply(data$str$Ward,  function(W){
-        IMMstateH[IMMstateH$ward == W, "n"] <-  data$str[data$str$Ward == W, "H"]
-        IMMstateH[IMMstateH$ward == W,] }) %>% do.call(rbind, .)
+      IMMstateH %<>%  merge(., data$str[, c("Ward", "H")], all = T, by.x = "ward", by.y = "Ward")
 
       setDT(IMMstateH)
 
-      IMMstateH[imm == "NI", n := ceiling(n * hNI - 0.5)]
-      IMMstateH[imm == "PI", n := ceiling(n * hPI - 0.5)]
-      IMMstateH[imm == "FI", n := ceiling(n * hFI - 0.5)]
-      IMMstateH[, pop := "h"]
+      apply(data$str, 1, function(W){
 
+        nH <- sample(c("NI", "PI", "FI"), W["H"], prob = c(hNI, hPI, hFI), replace = T) %>% table
+
+        if("NI" %in% names(nH))
+          IMMstateH[ward == W["Ward"] & imm == "NI", n := nH[["NI"]]]
+
+        if("PI" %in% names(nH))
+          IMMstateH[ward == W["Ward"] & imm == "PI", n := nH[["PI"]]]
+
+        if("FI" %in% names(nH))
+          IMMstateH[ward == W["Ward"] & imm == "FI", n := nH[["FI"]]]
+
+        IMMstateH[, pop := "h"]
+      })
+
+      IMMstateH[, H:=NULL]
 
       data$IMMstate <- rbind(data$IMMstate[pop != "h",], IMMstateH)
       data$IMMstate %<>% .[.$n != 0, ]
     }
   })
+
+
+  output$updated_hNI_NL <- renderUI({
+    hNI <- (1- input$PrevVacc) * 100
+
+    valueBox(paste(hNI, "%"), "of non immune healthcare workers", icon = NULL,
+             color = "red", width = 4,
+             href = NULL)
+  })
+
+  #######  Modified immunity prop at hospital-scale
+
+  output$updated_hNI_ML <- renderUI({
+    hNI <- 100 - input$hFI - input$hPI
+
+    valueBox(paste(hNI, "%"), "of non immune healthcare workers", icon = NULL,
+             color = "red", width = 4,
+             href = NULL)
+  })
+
+  output$updated_hPI <- renderUI({
+    hPI <- input$PrevVacc * 100 * input$propV1
+    valueBox(paste(hPI, "%"), "of partially immune healthcare workers", icon = NULL,
+             color = "orange", width = 4,
+             href = NULL)
+  })
+
+  output$updated_hFI <- renderUI({
+    hFI <- input$PrevVacc * 100 * input$propV2
+    valueBox(paste(hFI, "%"), "of fully immune healthcare workers", icon = NULL,
+             color = "green", width = 4,
+             href = NULL)
+  })
+
+  observeEvent(input$updateimmuStatHML, {
+
+    hNI <- (100 - input$hFI - input$hPI)/100
+    hPI <- (input$hPI / 100)
+    hFI <- (input$hFI / 100)
+
+    IMMstateH <- expand.grid(
+      ward = data$str$Ward,
+      imm = c("NI","PI","FI"))
+
+    IMMstateH %<>%  merge(., data$str[, c("Ward", "H")], all = T, by.x = "ward", by.y = "Ward")
+
+    setDT(IMMstateH)
+
+    apply(data$str, 1, function(W){
+
+      nH <- sample(c("NI", "PI", "FI"), W["H"], prob = c(hNI, hPI, hFI), replace = T) %>% table
+
+      if("NI" %in% names(nH))
+        IMMstateH[ward == W["Ward"] & imm == "NI", n := nH[["NI"]]]
+
+      if("PI" %in% names(nH))
+        IMMstateH[ward == W["Ward"] & imm == "PI", n := nH[["PI"]]]
+
+      if("FI" %in% names(nH))
+        IMMstateH[ward == W["Ward"] & imm == "FI", n := nH[["FI"]]]
+
+      IMMstateH[, pop := "h"]
+    })
+
+    IMMstateH[, H:=NULL]
+
+    data$IMMstate <- rbind(data$IMMstate[pop != "h",], IMMstateH)
+    data$IMMstate %<>% .[.$n != 0, ]
+  })
+
+
+  ####### Modified immunity prop at ward-scale
 
   # when addIMMH is activated (see body_ui)
   observeEvent(input$addIMMHs, {
@@ -705,21 +802,28 @@ server <- function(input, output, session) {
   # Update immunity level states
   observeEvent(input$addIMMH, {
     isolate({
+
+      IMMstateH <- expand.grid(
+        ward = input$IMMHWard,
+        imm = c("NI","PI","FI"))
+
       nH <- data$str %>% .[.$Ward == input$IMMHWard,"H"]
 
-      print(nH)
+      hNI <- input$W_hNI/100
+      hPI <- input$W_hPI/100
+      hFI <- input$W_hFI/100
 
-        # add ward to wards structure data.frame
-      data$IMMstate %<>% .[(.$ward != input$IMMHWard | .$pop != "h"),]
-      data$IMMstate %<>% rbind(.,data.frame(ward = input$IMMHWard,
-                                            pop = "h",
-                                            imm = c("NI","PI","FI"),
-                                            n = c(ceiling(nH*(input$W_hNI/100) - 0.5),
-                                                  ceiling(nH*(input$W_hPI/100) - 0.5),
-                                                  ceiling(nH*(input$W_hFI/100) - 0.5)
-                                                  )
-                                            )
-                               )
+      sample(c("NI", "PI", "FI"), nH, prob = c(hNI, hPI, hFI), replace = T) %>% table %>% data.frame
+
+      IMMstateH %<>% merge(., prop, by.x = "imm", by.y = ".")
+
+      setDT(IMMstateH)
+
+      setnames(IMMstateH, "Freq", "n")
+      IMMstateH[, pop := "h"]
+
+      data$IMMstate <- rbind(data$IMMstate[pop != "h" | ward != input$IMMHWard,], IMMstateH)
+
       data$IMMstate %<>% .[.$n != 0, ]
 
     })
@@ -742,62 +846,6 @@ server <- function(input, output, session) {
     )
   })
 
-  output$updated_hNI_NL <- renderUI({
-      hNI <- (1- input$PrevVacc) * 100
-
-    valueBox(paste(hNI, "%"), "of non immune healthcare workers", icon = NULL,
-             color = "red", width = 4,
-             href = NULL)
-  })
-
-  output$updated_hNI_ML <- renderUI({
-    hNI <- 100 - input$hFI - input$hPI
-
-    valueBox(paste(hNI, "%"), "of non immune healthcare workers", icon = NULL,
-             color = "red", width = 4,
-             href = NULL)
-  })
-
-
-
-  output$updated_hPI <- renderUI({
-    hPI <- input$PrevVacc * 100 * input$propV1
-    valueBox(paste(hPI, "%"), "of partially immune healthcare workers", icon = NULL,
-             color = "orange", width = 4,
-             href = NULL)
-  })
-
-
-
-  output$updated_hFI <- renderUI({
-    hFI <- input$PrevVacc * 100 * input$propV2
-    valueBox(paste(hFI, "%"), "of fully immune healthcare workers", icon = NULL,
-             color = "green", width = 4,
-             href = NULL)
-  })
-
-
-
-  observeEvent(input$updateimmuStatHML, {
-
-    IMMstateH <- expand.grid(
-      ward = data$str$Ward,
-      imm = c("NI","PI","FI"))
-
-    IMMstateH <- lapply(data$str$Ward,  function(W){
-      IMMstateH[IMMstateH$ward == W, "n"] <-  data$str[data$str$Ward == W, "H"]
-      IMMstateH[IMMstateH$ward == W,] }) %>% do.call(rbind, .)
-
-    setDT(IMMstateH)
-
-    IMMstateH[imm == "NI", n := ceiling(n * ((100 - input$hFI - input$hPI)/100) - 0.5)]
-    IMMstateH[imm == "PI", n := ceiling(n * (input$hPI / 100) - 0.5)]
-    IMMstateH[imm == "FI", n := ceiling(n * (input$hFI / 100) - 0.5)]
-    IMMstateH[, pop := "h"]
-
-
-    data$IMMstate <- rbind(data$IMMstate[pop != "h",], IMMstateH)
-  })
 
   ###############################################
   #### Specify initial epidemiological states ###
@@ -934,13 +982,11 @@ server <- function(input, output, session) {
     }
   )
 
-
   ############
   ############
   ### Display and edit tables
   ############
   ############
-
 
   ########
   ## Structure

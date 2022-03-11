@@ -18,7 +18,7 @@ body <- dashboardBody(
     tabItemParamvacc(),
     tabItemParamAll(),
     tabItemSimuDescription(),
-    tabItemSimSurvContr(),
+    # tabItemSimSurvContr(),
     tabItemSimmulations(),
     tabItemAbout()
   )

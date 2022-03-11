@@ -10,4 +10,5 @@ deleteWardbutton  <- function(input, output, session, dataset, rows){
               if(remWard %in% dataset$intro$ward)
                 dataset$intro <- dataset$intro[dataset$intro$ward != remWard, ]
         })
+
     }

@@ -46,7 +46,7 @@ sidebar <- dashboardSidebar(
              menuSubItem("Epidemiology", tabName = "epidemio"),
              menuSubItem("Test", tabName = "test"),
              menuSubItem("Immunity/Vaccination", tabName = "vaccination"),
-             menuSubItem("See more parameters", tabName = "allparams")),
+             menuSubItem("Modeling expert corner", tabName = "allparams", icon = icon("cogs"))),
     hidden(menuItem("hiddenEPI", tabName = "hiddenEPI")),
 
     ###################
@@ -56,7 +56,7 @@ sidebar <- dashboardSidebar(
     ###################
 
     menuItem("Simulation", icon = icon("play"), tabName = "SIM", expandedName = "SIM",
-             menuSubItem("Control and surveillance options", tabName = "CS"),
+             # menuSubItem("Control and surveillance options", tabName = "CS"),
              menuSubItem("Simulations", tabName = "SI")
     ),
     hidden(menuItem("hiddenSIM", tabName = "hiddenSIM")),

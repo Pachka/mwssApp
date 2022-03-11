@@ -32,9 +32,7 @@ source('functions/addWardbutton.R', local = TRUE)
 source('functions/editWardbutton.R', local = TRUE)
 source('functions/deleteWardbutton.R', local = TRUE)
 
-
 # App Structure function
-
 
 source('body/presentation.R', local = TRUE)
 source('body/structure/tabItemStructure.R', local = TRUE)
@@ -44,7 +42,7 @@ source('body/parameters/tabItemParamtest.R', local = TRUE)
 source('body/parameters/tabItemParamvacc.R', local = TRUE)
 source('body/parameters/tabItemParamAll.R', local = TRUE)
 source('body/simulations/tabItemSimuDescription.R', local = TRUE)
-source('body/simulations/tabItemSimSurvContr.R', local = TRUE)
+# source('body/simulations/tabItemSimSurvContr.R', local = TRUE)
 source('body/simulations/tabItemSimulations.R', local = TRUE)
 source('body/about.R', local = TRUE)
 
