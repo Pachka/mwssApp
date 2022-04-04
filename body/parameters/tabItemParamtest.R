@@ -11,7 +11,6 @@ tabItemParamtest <- function(){
             box(
               width = 12,
               title = "Test effectiveness",
-              status = "primary",
               solidHeader = TRUE,
               checkboxGroupInput('testuse', "What kind of test are you using?", choices = c("Ag-RDT", "RT-PCR")),
               em("Multiple choices are possible."),

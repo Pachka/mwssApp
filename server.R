@@ -34,8 +34,8 @@ server <- function(input, output, session) {
     # Prop of time per HCWS in each unit as data.frame
     TS = data.frame("Worker" = character(),
                     "Ward" = numeric(),
-                   # "total" = numeric(),
-                   stringsAsFactors = F),
+                    # "total" = numeric(),
+                    stringsAsFactors = F),
     intro = NULL,
     IMMstate = NULL,
     EPIstate = NULL
@@ -163,7 +163,7 @@ server <- function(input, output, session) {
       data$TS[(recH + 1):(recH + input$H_pop_size), "Ward"] <-
         input$ward
       data$TS[(recH + 1):(recH + input$H_pop_size), "Worker"] <-
-                paste0(paste0(input$ward, "_"), seq(input$H_pop_size))
+        paste0(paste0(input$ward, "_"), seq(input$H_pop_size))
 
       # set time of other P into new ward to 0
       data$TS[is.na(data$TS)] <- 0
@@ -215,7 +215,7 @@ server <- function(input, output, session) {
       data$str[data$str$Ward == input$wardtomod,"Turnover"] <- input$turnoverNEW
       data$str[data$str$Ward == input$wardtomod,"Visits"] <- input$V_pop_sizeNEW
 
-      print(input$H_pop_sizeNEW - popH)
+      # print(input$H_pop_sizeNEW - popH)
 
       #####
       ##### Update TS table
@@ -325,46 +325,46 @@ server <- function(input, output, session) {
       conditionalPanel(
         "input.IMMPWard != ''",
         knobInput(
-        inputId = "W_pFI",
-        label = "Number of fully immune patients",
-        value = 0,
-        min = 0,
-        max = data$str %>% .[.$Ward == input$IMMPWard,"P"],
-        # post = "%",
-        displayPrevious = TRUE,
-        lineCap = "round",
-        fgColor = "#D9FF66",
-        inputColor = "#C6FF1A"
-      ),
-      knobInput(
-        inputId = "W_pPI",
-        label = "Number of partially immune patients",
-        value = 0,
-        min = 0,
-        max = data$str %>% .[.$Ward == input$IMMPWard,"P"],
-        # post = "%",
-        displayPrevious = TRUE,
-        lineCap = "round",
-        fgColor = "#FFD966",
-        inputColor = "#FFC61A"
-      ),
-      knobInput(
-        inputId = "W_pNI",
-        label = "Number of non immune patients",
-        value = data$str %>% .[.$Ward == input$IMMPWard,"P"],
-        min = 0,
-        max = data$str %>% .[.$Ward == input$IMMPWard,"P"],
-        # post = "%",
-        displayPrevious = TRUE,
-        lineCap = "round",
-        fgColor = "#FF6666",
-        inputColor = "#FF1A1A",
-        readOnly = T
-      )
+          inputId = "W_pFI",
+          label = "Number of fully immune patients",
+          value = 0,
+          min = 0,
+          max = data$str %>% .[.$Ward == input$IMMPWard,"P"],
+          # post = "%",
+          displayPrevious = TRUE,
+          lineCap = "round",
+          fgColor = "#D9FF66",
+          inputColor = "#C6FF1A"
+        ),
+        knobInput(
+          inputId = "W_pPI",
+          label = "Number of partially immune patients",
+          value = 0,
+          min = 0,
+          max = data$str %>% .[.$Ward == input$IMMPWard,"P"],
+          # post = "%",
+          displayPrevious = TRUE,
+          lineCap = "round",
+          fgColor = "#FFD966",
+          inputColor = "#FFC61A"
+        ),
+        knobInput(
+          inputId = "W_pNI",
+          label = "Number of non immune patients",
+          value = data$str %>% .[.$Ward == input$IMMPWard,"P"],
+          min = 0,
+          max = data$str %>% .[.$Ward == input$IMMPWard,"P"],
+          # post = "%",
+          displayPrevious = TRUE,
+          lineCap = "round",
+          fgColor = "#FF6666",
+          inputColor = "#FF1A1A",
+          readOnly = T
+        )
       ),
       conditionalPanel(
         "input.IMMPWard != ''",
-      uiOutput("addIMMPButton")),
+        uiOutput("addIMMPButton")),
       easyClose = TRUE
     ))
   })
@@ -380,7 +380,7 @@ server <- function(input, output, session) {
                     options = list(max = pNI))
 
     updateKnobInput(session, 'W_pPI',
-                      value = pPI,
+                    value = pPI,
                     options = list(max = pNI))
 
     updateKnobInput(session, 'W_pNI',
@@ -390,20 +390,20 @@ server <- function(input, output, session) {
 
   observeEvent(input$W_pFI, {
     isolate({
-    pop <- data$str %>% .[.$Ward == input$IMMPWard,"P"]
+      pop <- data$str %>% .[.$Ward == input$IMMPWard,"P"]
 
-    pFI <- input$W_pFI
-    pPI <- input$W_pPI
-    pNIup <- pop - input$W_pFI - input$W_pPI
+      pFI <- input$W_pFI
+      pPI <- input$W_pPI
+      pNIup <- pop - input$W_pFI - input$W_pPI
 
-    print(c( pop = pop, pFI = pFI, pPI = pPI, pNI = pNIup))
+      # print(c( pop = pop, pFI = pFI, pPI = pPI, pNI = pNIup))
 
-    updateKnobInput(session, 'W_pPI',
-                    options = list(max = pop - pFI))
+      updateKnobInput(session, 'W_pPI',
+                      options = list(max = pop - pFI))
 
-    updateKnobInput(session, 'W_pNI',
-                    value = pNIup,
-                    options = list(max = pNIup))
+      updateKnobInput(session, 'W_pNI',
+                      value = pNIup,
+                      options = list(max = pNIup))
     })
   })
 
@@ -421,7 +421,7 @@ server <- function(input, output, session) {
 
   ## when addBut in the remote window is activated
   output$addIMMPButton <- renderUI({
-      actionButton("addIMMP", "Add")
+    actionButton("addIMMP", "Add")
   })
 
   # Update immunity level states
@@ -435,7 +435,7 @@ server <- function(input, output, session) {
                                             n = c(input$W_pNI,
                                                   input$W_pPI,
                                                   input$W_pFI)
-                                            )
+      )
       )
       data$IMMstate %<>% .[.$n != 0, ]
 
@@ -917,7 +917,7 @@ server <- function(input, output, session) {
 
   ## when addBut in the remote window is activated
   output$addinfBut <- renderUI({
-    if (length(data$str$Ward) >0) {
+    if (length(data$str$Ward) > 0) {
       actionButton("addepistates", "Add")
     }
   })
@@ -927,10 +927,10 @@ server <- function(input, output, session) {
     isolate({
       # add ward to wards structure data.frame
       data$intro %<>% rbind(.,
-                              data.frame(ward =  input$wardinf,
-                                         number = input$epiSize,
-                                         type = ifelse(input$epiType == "P", "P", "H"),
-                                         epiStat = input$epiStat))
+                            data.frame(ward =  input$wardinf,
+                                       number = input$epiSize,
+                                       type = ifelse(input$epiType == "P", "P", "H"),
+                                       epiStat = input$epiStat))
 
     })
   })
@@ -958,13 +958,13 @@ server <- function(input, output, session) {
   observeEvent(eventExpr = input$myconfirmation,
                handlerExpr = {
                  if(isTRUE(input$myconfirmation)){
-                 req(input$loadwards)
+                   req(input$loadwards)
 
-                 load(input$loadwards$datapath)
+                   load(input$loadwards$datapath)
 
-                 data$str <- savedstrdf$structure
-                 data$TS <- savedstrdf$matContact
-                 data$IMMstate <- savedstrdf$IMMstate}
+                   data$str <- savedstrdf$structure
+                   data$TS <- savedstrdf$matContact
+                   data$IMMstate <- savedstrdf$IMMstate}
                }, ignoreNULL = FALSE)
 
 
@@ -997,7 +997,7 @@ server <- function(input, output, session) {
     structurelayout <- data$str
     ##rename column names to (inside renderDT)
     if(!is.null(structurelayout))
-    colnames(structurelayout)[2:5] <- c("Patients", "Health care Workers", "Avg number of visits", "Avg length of stay")
+      colnames(structurelayout)[2:5] <- c("Patients", "Health care Workers", "Avg number of visits", "Avg length of stay")
 
     DT::datatable(
       structurelayout,
@@ -1007,10 +1007,10 @@ server <- function(input, output, session) {
     )
   })
 
-    # rows <- reactive({input$data_rows_selected})
-    # if (!is.null(rows)){
-    #   callModule(deleteWardbutton, "deleteward", dataset = data, rows = rows)
-    #   }
+  # rows <- reactive({input$data_rows_selected})
+  # if (!is.null(rows)){
+  #   callModule(deleteWardbutton, "deleteward", dataset = data, rows = rows)
+  #   }
 
   observeEvent(input$deletebut,{
 
@@ -1031,11 +1031,11 @@ server <- function(input, output, session) {
   ##########
 
   output$TS = renderDT(data$TS,
-                      # filter = 'top',
-                      selection = 'none',
-                      rownames = FALSE,
-                      editable = TRUE,
-                      options = list(pageLength = 10))
+                       # filter = 'top',
+                       selection = 'none',
+                       rownames = FALSE,
+                       editable = TRUE,
+                       options = list(pageLength = 10))
 
   proxyTS = dataTableProxy('TS')
 
@@ -1052,16 +1052,16 @@ server <- function(input, output, session) {
 
     replaceData(proxyTS, data$TS, resetPaging = FALSE)  # replaces data displayed by the updated table
   })
-#
-#   ############
-#   ## Initial Epidemiological state
-#   ############
-#
+  #
+  #   ############
+  #   ## Initial Epidemiological state
+  #   ############
+  #
   output$intro <- DT::renderDT({
 
     ##rename column names to (inside renderDT)
     if(!is.null(data$intro))
-    colnames(data$intro)[2:3] <- c("Patients", "Health care Workers")
+      colnames(data$intro)[2:3] <- c("Patients", "Health care Workers")
 
     DT::datatable(
       data$intro,
@@ -1073,9 +1073,9 @@ server <- function(input, output, session) {
   })
 
   output$intro = renderDT(data$intro,
-                       rownames = FALSE,
-                       # editable = TRUE,
-                       options = list(pageLength = 10))
+                          rownames = FALSE,
+                          # editable = TRUE,
+                          options = list(pageLength = 10))
 
   proxyintro = dataTableProxy('intro')
 
@@ -1159,7 +1159,7 @@ server <- function(input, output, session) {
       shinyWidgets::updateProgressBar(session = session, id = "pb", value = 0) # reinitialize to 0 if you run the calculation several times
       session$sendCustomMessage(type = 'launch-modal', "my-modal") # launch the modal
 
-      mwss::plot_wardsConnect(matContact, vertex_size)
+      mwss::plot_connectivity(matContact, vertex_size, verbose = FALSE)
     }
 
   })
@@ -1178,7 +1178,7 @@ server <- function(input, output, session) {
       nVisits <- data$str$Visits %>% as.numeric %>% divide_by(7)
       LS <- data$str$Turnover %>% as.numeric # FIX ME adjust
       if(input$airlockEffective)
-      nHCWS_AL <- input$nHCWS_AL
+        nHCWS_AL <- input$nHCWS_AL
 
       IMMstate <- data$IMMstate
 
@@ -1298,54 +1298,103 @@ server <- function(input, output, session) {
 
       params_dataset %<>% lapply(., as.numeric)
 
-      output <- mwssShiny(params_dataset,
-                     xstart,
-                     matContact,
-                     nSimulations = input$n_sim,
-                     duration = input$n_days,
-                     isoWard = input$isoWard,
-                     airlockEffective = input$airlockEffective,
-                     scenario =  input$scenario,
-                     test_str = input$test_str,
-                     Vaccination = input$Vaccination)
+      # print(params_dataset)
+      # print(xstart)
+      # print(matContact)
+      # print(input$n_sim)
+      # print(input$n_days)
+      # print(input$isoWard)
+      # print(input$airlockEffective)
+      # print(input$scenario)
+      # print(input$test_str)
+      # print(input$Vaccination)
+
+      save(params_dataset, file = "data/test_data/params_dataset.Rda" )
+      save(xstart, file = "data/test_data/xstart.Rda")
+      save(matContact, file = "data/test_data/matContact.Rda")
+      n_sim <- input$n_sim
+      save(n_sim, file = "data/test_data/n_sim.Rda")
+      n_days <- input$n_days
+      save(n_days, file = "data/test_data/n_days.Rda")
+      isoWard <- input$isoWard
+      save(isoWard, file = "data/test_data/isoWard.Rda")
+      airlockEffective <- input$airlockEffective
+      save(airlockEffective, file = "data/test_data/airlockEffective.Rda")
+      scenario <- input$scenario
+      save(scenario, file = "data/test_data/scenario.Rda")
+      test_str <- input$test_str
+      save(test_str, file = "data/test_data/test_str.Rda")
+      Vaccination <- input$Vaccination
+      save(Vaccination, file = "data/test_data/Vaccination.Rda")
+
+      if(input$scenario == "FALSE")
+        output <- mwss(params_dataset,
+                       xstart,
+                       matContact,
+                       nSimulations = input$n_sim,
+                       duration = input$n_days,
+                       isoWard = input$isoWard,
+                       airlockEffective = input$airlockEffective,
+                       scenario =  FALSE,
+                       test_str = input$test_str,
+                       Vaccination = input$Vaccination) else
+                         output <- mwss(params_dataset,
+                                        xstart,
+                                        matContact,
+                                        nSimulations = input$n_sim,
+                                        duration = input$n_days,
+                                        isoWard = input$isoWard,
+                                        airlockEffective = input$airlockEffective,
+                                        scenario =  input$scenario,
+                                        test_str = input$test_str,
+                                        Vaccination = input$Vaccination)
+
+      save(output, file = "data/test_data/output.Rda")
       output
 
     } else {
       # FIX ME POP UP WINDOW
-        print("A minimum of two wards is required to run the model")
+      print("A minimum of two wards is required to run the model")
     }
 
   })
 
-  # Display tables
-  output$transmission <- DT::renderDataTable(summary(runmodel(), focus = "transmission")$perWard %>% data.frame,
-                                       rownames = T,
-  )
-  output$incidenceP <- DT::renderDataTable(summary(runmodel(), focus = "incidence")$incP %>% data.frame,
-                                           rownames = T,
-  )
-  output$incidenceH <- DT::renderDataTable(summary(runmodel(), focus = "incidence")$incH %>% data.frame,
-                                           rownames = T,
-  )
-
-
   # value boxes
+
+  ###### Probability of outbreak
+
+
+  ###### Average number of transmissions
   output$nTransmission <- renderValueBox({
-    valueBox(summary(runmodel(), "none")$TrSec$quantiles[["50%"]],
-             "Number of secondary transmission",
-             icon = icon("fire"), color = "yellow")
+    valueBox(summary(runmodel(), input$test_str)$TrSec$quantiles[["50%"]],
+             "Median number of contaminations inside the facility",
+             icon = icon("fire"), color = "yellow", width=NULL)
   })
 
-  output$incidence <- renderValueBox({
-    valueBox(summary(runmodel(), "none")$incP1$quantiles[["50%"]],
-             "Patient with middle symp. incidence",
-             icon = icon("exclamation-triangle"), color = "green")
-  })
-
+  ###### Number of test
   output$nTest <- renderValueBox({
-    valueBox(summary(runmodel(), "none")$nTestsHosp$quantiles[["50%"]],
-             "Number of tests", icon = icon("exclamation-triangle"), color = "orange")
+    valueBox(summary(runmodel(), input$test_str)$nTestsHosp$quantiles[["50%"]],
+             "Median number of tests performed in the facility", icon = icon("exclamation-triangle"), color = "orange", width=NULL)
   })
+
+  ###### Incidences
+  #### Patients
+  output$incidenceP <- renderValueBox({
+    valueBox(summary(runmodel(), input$test_str)$incidence$quantiles["50%","P"],
+             "Median incidence among patients",
+             icon = icon("bed"), color = "green", width=NULL)
+  })
+
+  #### HCWS
+  output$incidenceH <- renderValueBox({
+    valueBox(summary(runmodel(), input$test_str)$incidence$quantiles["50%","H"],
+             "Median incidence among healthcare workers",
+             icon = icon("user-md"), color = "green", width=NULL)
+  })
+
+  #########
+  ######### Network plot
+  #########
 
   output$pOutbreak <- renderPlot({
 
@@ -1358,12 +1407,24 @@ server <- function(input, output, session) {
 
   })
 
+  #########
+  ######### Daily test boxplot
+  #########
 
   output$plotDailyTest <- renderPlot({
 
     plotDailyTest(summary(runmodel(), input$test_str)$nDailyTestsHosp$perSim, startday = FALSE)
 
   })
+
+  output$plotIncidence <- renderPlot({
+    plotcumInc(runmodel())
+  })
+
+  #########
+  ######### Trajectories of cumulative incidences ?
+  #########
+
 
 
   ############
@@ -1427,18 +1488,18 @@ server <- function(input, output, session) {
 
     # Surveillance and control
     updateNumericInput(session, 'gammapreIso', value = params_dataset$gammapreIso)
-  updateNumericInput(session, 'gammaIso', value = params_dataset$gammaIso)
-  updateNumericInput(session, 'nHCWS_AL', value = params_dataset$nHCWS_AL)
-  updateNumericInput(session, 'timeExCli', value = params_dataset$timeExCli)
-  updateNumericInput(session, 'timeTest', value = params_dataset$timeTest)
-  updateNumericInput(session, 'betaPP_AL', value = params_dataset$betaPP_AL)
-  updateNumericInput(session, 'betaPH_AL', value = params_dataset$betaPH_AL)
-  updateNumericInput(session, 'betaHH_AL', value = params_dataset$betaHH_AL)
-  updateNumericInput(session, 'betaHP_AL', value = params_dataset$betaHP_AL)
-  # updateNumericInput(session, 'regHtint', value = params_dataset$regHtint)
-  # updateNumericInput(session, 'regPtint', value = params_dataset$regPtint)
-  updateNumericInput(session, 'sensInf', value = params_dataset$sensInf)
-  updateNumericInput(session, 'sensNInf', value = params_dataset$sensNInf)
+    updateNumericInput(session, 'gammaIso', value = params_dataset$gammaIso)
+    updateNumericInput(session, 'nHCWS_AL', value = params_dataset$nHCWS_AL)
+    updateNumericInput(session, 'timeExCli', value = params_dataset$timeExCli)
+    updateNumericInput(session, 'timeTest', value = params_dataset$timeTest)
+    updateNumericInput(session, 'betaPP_AL', value = params_dataset$betaPP_AL)
+    updateNumericInput(session, 'betaPH_AL', value = params_dataset$betaPH_AL)
+    updateNumericInput(session, 'betaHH_AL', value = params_dataset$betaHH_AL)
+    updateNumericInput(session, 'betaHP_AL', value = params_dataset$betaHP_AL)
+    # updateNumericInput(session, 'regHtint', value = params_dataset$regHtint)
+    # updateNumericInput(session, 'regPtint', value = params_dataset$regPtint)
+    updateNumericInput(session, 'sensInf', value = params_dataset$sensInf)
+    updateNumericInput(session, 'sensNInf', value = params_dataset$sensNInf)
 
   })
 
@@ -1452,28 +1513,28 @@ server <- function(input, output, session) {
 
     if(!is.null(data$IMMstate)){
 
-    IMMstateDT <- data$IMMstate
+      IMMstateDT <- data$IMMstate
 
-    IMMstateDT[, n := sum(n), by = list(ward, pop, imm)]
-    IMMstateDT %<>% unique
-    IMMstateDT[, prop := n %>% divide_by(sum(n)) %>% multiply_by(100) %>% round, by = list(ward, pop)]
-    IMMstateDT[, prop := paste(prop, "%")]
+      IMMstateDT[, n := sum(n), by = list(ward, pop, imm)]
+      IMMstateDT %<>% unique
+      IMMstateDT[, prop := n %>% divide_by(sum(n)) %>% multiply_by(100) %>% round, by = list(ward, pop)]
+      IMMstateDT[, prop := paste(prop, "%")]
 
-    IMMstateDT[imm == "NI", imm := "Non immune"]
-    IMMstateDT[imm == "PI", imm := "Partially immune"]
-    IMMstateDT[imm == "FI", imm := "Fully immune"]
+      IMMstateDT[imm == "NI", imm := "Non immune"]
+      IMMstateDT[imm == "PI", imm := "Partially immune"]
+      IMMstateDT[imm == "FI", imm := "Fully immune"]
 
-    IMMstateDT %<>% .[order(ward,pop, imm),]
+      IMMstateDT %<>% .[order(ward,pop, imm),]
 
-    colnames(IMMstateDT) <- c("ward", "Population","Immunity level", "Number of ind.", "Proportion")
+      colnames(IMMstateDT) <- c("ward", "Population","Immunity level", "Number of ind.", "Proportion")
 
-    DT::datatable(
-      IMMstateDT,
-      rownames = F,
-      escape = FALSE,
-      # editable = TRUE,
-      options = list(pageLength = 10)
-    )
+      DT::datatable(
+        IMMstateDT,
+        rownames = F,
+        escape = FALSE,
+        # editable = TRUE,
+        options = list(pageLength = 10)
+      )
 
 
     }
@@ -1492,6 +1553,46 @@ server <- function(input, output, session) {
 
   observe_helpers(session = shiny::getDefaultReactiveDomain(),
                   help_dir = "helpfiles", withMathJax = FALSE)
+
+
+  ####### Generating downloadable reports
+
+  output$report <- downloadHandler(
+    # For PDF output, change this to "report.pdf"
+    filename = "report.html",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+
+      # Set up parameters to pass to Rmd document
+
+      mwssoutput <- runmodel()
+
+      contacts <- t(data$TS[, ! names(data$TS) %in% c("Worker", "Ward")])
+      colnames(contacts) <- data$TS[,1]
+
+      matContact <- mwss::timeShare(contacts, namesincol1 = FALSE)
+      test_str <- input$test_str
+
+      params <- list(mwssoutput = mwssoutput,
+                     matContact = matContact,
+                     test_str = test_str,
+                     P = data$str$P
+      )
+
+
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
 
   #### Perspectives
   # Un panneau pour le partage des soignants

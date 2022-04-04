@@ -14,7 +14,7 @@ tabItemAbout <- function(){
 
 
     ### Authors
-    Hammami Pachka (1,2), Oodally Ajmal (1,2), Laura Temine (3), Lulla Opatowski (2)
+    Hammami Pachka (1,2), Oodally Ajmal (1,2), Laura Temime (3), Lulla Opatowski (2)
 
     1. Universite paris saclay
     2. Institut Pasteur

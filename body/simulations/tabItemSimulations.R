@@ -8,7 +8,21 @@ tabItemSimmulations <- function(){
   tabItem("SI",
           fluidRow(
             box("Control and surveillance mesures -- temporary",
+                solidHeader = T,
+                width = 12,
                 checkboxInput(inputId = "isoWard", label = "Account for the implementation of an isolated ward?", value = FALSE, width = NULL),
+                conditionalPanel(
+                  condition = "input.isoWard == 1",
+                  numericInput(
+                    'gammapreIso',
+                    'Average duration of before confinement (days)',
+                    value = params_dataset$gammapreIso, min = 0.5, step = 0.5
+                  ),
+                  numericInput(
+                    'gammaIso',
+                    'Average duration of confinement (days)',
+                    value = params_dataset$gammaIso, min = 0.5, step = 0.5
+                  )),
                 checkboxInput(inputId = "airlockEffective", label = "Account for the implementation of contact restriction at the admission (airlock)?", value = FALSE, width = NULL),
                 selectInput(
                   inputId = "scenario",
@@ -36,6 +50,7 @@ tabItemSimmulations <- function(){
               title = "Simulations parameters",
               solidHeader = T,
               width = 12,
+              status = "primary",
               # Only show this panel if the plot type is a histogram
               numericInput(
                 'n_sim',
@@ -56,32 +71,22 @@ tabItemSimmulations <- function(){
                 condition = "input.simP == 1",
                 dateInput("startSimP", "Simulate prevalences and vacc. proportions from:", value = "2022-01-01", format = "dd/mm/yy")
               ),
-              actionButton("run", "Run", icon = icon("play"), color = "orange")
+              actionButton("run", "Run", icon = icon("play"), style="color: #fff; background-color: #063567; border-color: #2e6da4"),
+              downloadButton("report", "Generate report")
             )),
-          fluidRow(
-            valueBoxOutput("nTransmission"),
-            valueBoxOutput("incidence"),
-            valueBoxOutput("nTest")
+          splitLayout(
+            valueBoxOutput("nTransmission", width=NULL),
+            valueBoxOutput("nTest", width=NULL),
+            valueBoxOutput("incidenceP", width=NULL),
+            valueBoxOutput("incidenceH", width=NULL)
           ),
           fluidRow(
+            h5("Probability of outbreak"),
             plotOutput("pOutbreak"),
+            h5("Daily cumulative incidence"),
+            plotOutput("plotIncidence"),
+            h5("Daily number of tests"),
             plotOutput("plotDailyTest")
-            # box(
-            #   title = "Probability of outbreak",
-            #   solidHeader = T,
-            #   plotOutput("pOutbreak")
-            # )
-          ),
-          fluidRow(
-            box(title = "Output at ward scale",
-                solidHeader = T,
-                h3("Tranmission events"),
-                div(DT::DTOutput("transmission"), style = "font-size: 70%;"),
-                h3("Incidence among patients"),
-                div(DT::DTOutput("incidenceP"), style = "font-size: 70%;"),
-                h3("Incidence among healthcare workers"),
-                div(DT::DTOutput("incidenceH"), style = "font-size: 70%;")
-            )
           )
   )
 }

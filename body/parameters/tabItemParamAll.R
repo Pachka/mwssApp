@@ -273,7 +273,56 @@ tabItemParamAll <- function(){
               'duration of stay of visitors in the ward',
               value = params_dataset$gammaVout, min = 0, step = 1
             )
-          ))
+          ),
+          selectizeInput("AL_test", "Is the clinical examination systematically followed by a test?",
+                           choices = c("No, only symptomatic by antigenic",
+                                       "No, only symptomatic by PCR",
+                                       "Yes, by antigenic",
+                                       "Yes, by PCR",
+                                       "Yes, in each ward, a pooled PCR-test is performed daily with samples from all new patients. In case of positive results, each admission is individually tested.",
+                                       "Yes, a pooled PCR-test is performed daily at the hospital scale with samples from all new patients. In case of positive results, each admission is individually tested.")
+
+            ),
+            numericInput(
+              'nHCWS_AL',
+              'Number of healthcare workers in contact with patients before test results',
+              value = 1,
+              min = 1,
+              step = 1
+            ),
+            numericInput(
+              'timeExCli',
+              'Duration of stay in the admission airlock for clinical examination in hours',
+              value = params_dataset$timeExCli, min = 0, step = 0.5
+            ),
+            numericInput(
+              'timeTest',
+              'Duration of stay in the admission  airlock for PCR testing in hours',
+              value = params_dataset$timeTest, min = 0, step = 0.5
+            ),
+            numericInput(
+              'betaPP_AL',
+              'From patient to patient in the airlock',
+              value = params_dataset$betaPP_AL, max = 1, min = 0, step = 0.01
+            ),
+            checkboxInput("allBetaAL", "Define all contact rates", value = FALSE, width = NULL),
+            conditionalPanel(condition = 'input.allBetaAL == 1',
+                             numericInput(
+                               'betaPH_AL',
+                               'From patient to healthcare worker in the airlock',
+                               value = params_dataset$betaPH_AL, max = 1, min = 0, step = 0.01
+                             ),
+                             numericInput(
+                               'betaHH_AL',
+                               'From healthcare worker to healthcare worker in the airlock',
+                               value = params_dataset$betaHH_AL, max = 1, min = 0, step = 0.01
+                             ),
+                             numericInput(
+                               'betaHP_AL',
+                               'From healthcare worker to patient in the airlock',
+                               value = params_dataset$betaHP_AL, max = 1, min = 0, step = 0.01
+                             ))
+          )
   )
 }
 

@@ -1,0 +1,39 @@
+---
+title: "Epidemiological simulation report"
+output: html_document
+params:
+  mwssoutput: NA
+  matContact: NA
+  test_str: NA
+  P: NA
+---
+
+```{r eval = FALSE, echo = FALSE}
+# For PDF output, change the header to have "output: pdf_document".
+#
+# Note that due to an issue in rmarkdown, the default value of a parameter in
+# the header cannot be `NULL`, so I used a default of `NA` for the default value
+# of `n`.
+```
+
+```{r}
+library(mwss)
+
+```
+
+
+```{r}
+# The Median number of contaminations inside the facility,
+
+summary(params$mwssoutput, params$test_str)$TrSec$quantiles[["50%"]]
+
+```
+Plot test
+
+```{r}
+# Plot the probability of outbreak
+
+plot_pOutbreak(params$mwssoutput, params$matContact, params$P)
+```
+
+
