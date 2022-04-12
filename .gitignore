@@ -3,9 +3,4 @@
 .RData
 .Ruserdata
 www
-IMMstate.Rda
-LS.Rda
-nVisits.Rda
-pop_size_H.Rda
-pop_size_P.Rda
-ward.Rda
+tmpdata
