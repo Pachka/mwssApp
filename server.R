@@ -42,67 +42,6 @@ server <- function(input, output, session) {
   )
 
 
-  # params <- shiny::reactiveValues(
-  # ls = list(
-  #   betaPP     = numeric(),
-  #   betaHH     = numeric(),
-  #   betaPH     = numeric(),
-  #   betaHP     = numeric(),
-  #   betaVP     = numeric(),
-  #   betaPP_AL  = numeric(),
-  #   betaHH_AL  = numeric(),
-  #   betaPH_AL  = numeric(),
-  #   betaHP_AL  = numeric(),
-  #   Ta = numeric(),
-  #   gamma1 = numeric(),
-  #   gamma2 = numeric(),
-  #   gamma3 = numeric(),
-  #   gamma4 = numeric(),
-  #   gamma5 = numeric(),
-  #   gammaT = numeric(),
-  #   gammaBSL = numeric(),
-  #   gammaSL = numeric(),
-  #   gammaESL = numeric(),
-  #   gammapreIso = numeric(),
-  #   gammaIso= numeric(),
-  #   timeExCli = numeric(),
-  #   timeTest = numeric(),
-  #   nHCWS_AL = numeric(),
-  #   p = numeric(),
-  #   p2 = numeric(),
-  #   p2p = numeric(),
-  #   pDIC = numeric(),
-  #   pD = numeric(),
-  #   pT = numeric(),
-  #   pSL = numeric(),
-  #   pESL = numeric(),
-  #   sensInf = numeric(),
-  #   sensNInf = numeric(),
-  #   sensInfAnt = numeric(),
-  #   sensIncInfAnt = numeric(),
-  #   sensIncInf = numeric(),
-  #   PrevCom = numeric(),
-  #   PrevVacc = numeric(),
-  #   propV1 = numeric(),
-  #   propV2 = numeric(),
-  #   pv1p = input$pv1p,
-  #   pv1h = numeric(),
-  #   pv2p = numeric(),
-  #   pv2h = numeric(),
-  #   gammav1 = numeric(),
-  #   gammav2 = numeric(),
-  #   pInfV1 = numeric(),
-  #   pInfV2 = numeric(),
-  #   psv = numeric(),
-  #   p2pv = numeric(),
-  #   p2v = numeric(),
-  #   pDv = numeric(),
-  #   pTv = numeric(),
-  #   gammaVin = numeric(),
-  #   gammaVout = numeric()
-  # )
-  # )
-
   #####################################
   #######    Structure panel     ######
   #####################################
@@ -215,8 +154,6 @@ server <- function(input, output, session) {
       data$str[data$str$Ward == input$wardtomod,"Turnover"] <- input$turnoverNEW
       data$str[data$str$Ward == input$wardtomod,"Visits"] <- input$V_pop_sizeNEW
 
-      # print(input$H_pop_sizeNEW - popH)
-
       #####
       ##### Update TS table
       #####
@@ -287,6 +224,47 @@ server <- function(input, output, session) {
   ################################
 
   ### FIX ME: to do
+
+  #######################################
+  ####    Edit HCWS planning in TS    ###
+  #######################################
+
+
+  callModule(editplanningbutton, "editplanning", data$TS$Worker, data$str$Ward)
+
+  output$TSedit <- DT::renderDT({
+
+    planninglayout <- data$TS[which(data$TS$Worker == input$workertomod),]
+
+    DT::datatable(
+      planninglayout,
+      rownames = F,
+      editable = FALSE,
+      escape = FALSE
+    )
+
+  })
+
+  observeEvent(input$workertomod, {
+    # updateNumericInput(session, "P_pop_sizeNEW", value = data$str[data$str$Ward == input$wardtomod, "P"])
+    # updateNumericInput(session, "H_pop_sizeNEW", value = data$str[data$str$Ward == input$wardtomod, "H"])
+    # updateNumericInput(session, "turnoverNEW", value = data$str[data$str$Ward == input$wardtomod, "Turnover"])
+    # updateNumericInput(session, "V_pop_sizeNEW", value = data$str[data$str$Ward == input$wardtomod, "Visits"])
+  })
+
+  ## When modWbutton is activated
+  # Add ward/holding and HCWS to the tables: str, TS, IMMstate
+  observeEvent(input$modPlanbutton, {
+    isolate({
+
+      #####
+      ##### Update TS table
+      #####
+      data$TS[which(data$TS$Worker == input$workertomod),input$wardtomod] <- input$ptimeinWard
+
+    })
+
+  })
 
   #########################################
   #######    Parameters subpanel     ######
@@ -1030,12 +1008,26 @@ server <- function(input, output, session) {
   ## Time sharing
   ##########
 
-  output$TS = renderDT(data$TS,
-                       # filter = 'top',
-                       selection = 'none',
-                       rownames = FALSE,
-                       editable = TRUE,
-                       options = list(pageLength = 10))
+  output$TS <- renderDataTable({
+
+    TS <- data$TS
+    wardN <- data$str$Ward
+    TS$total <- TS[, wardN] %>% rowSums
+
+    datatable(TS) %>% formatStyle(
+      'total',
+      backgroundColor = styleInterval(c(99.9, 100.1), c('green', 'white', 'red')),
+      fontWeight = 'bold'
+    )
+
+  })
+
+  # output$TS = renderDT(data$TS,
+  #                      # filter = 'top',
+  #                      selection = 'none',
+  #                      rownames = FALSE,
+  #                      editable = TRUE,
+  #                      options = list(pageLength = 10))
 
   proxyTS = dataTableProxy('TS')
 
@@ -1052,7 +1044,7 @@ server <- function(input, output, session) {
 
     replaceData(proxyTS, data$TS, resetPaging = FALSE)  # replaces data displayed by the updated table
   })
-  #
+
   #   ############
   #   ## Initial Epidemiological state
   #   ############
@@ -1165,192 +1157,269 @@ server <- function(input, output, session) {
   })
 
 
+  ###########
+  ##### Plot the network
+  ###########
+
+  output$disease_states <- renderPlot({
+    # create a dataset
+    state <- c(rep("tE" , 3), rep("tEi" , 3) , rep("tI" , 3)) %>% factor(., levels = c("tI", "tEi", "tE"))
+    condition <- rep(c("Asymptomatic" , "Mild symptoms" , "Severe symptoms") , 3) %>%
+      factor(., levels = rev(c("Asymptomatic" , "Mild symptoms" , "Severe symptoms")))
+    value <- c(rep(input$tE , 3) , input$tEA, rep(input$tES , 2) , input$tIA, input$tIM, input$tIS)
+    data <- data.frame(state, condition, value)
+
+    ggplot(data, aes(fill= as.factor(state), y=value, x=condition)) +
+      geom_bar(position="stack", stat="identity") + coord_flip() +
+      xlab("") + ylab("Duration (days)") +
+      scale_fill_manual(values=c("#8b2312", "#E69F00", "#128b23"),
+                        name="Epidemiological\nstate",
+                        breaks= c("tI", "tEi", "tE"),
+                        labels=c("Infectious", "Incubating infectious", "Incubating non infectious"))
+
+
+  })
+
+
+
+
   ############
   ### Simulation section
   ############
 
   runmodel <- eventReactive(input$run, {
 
+
     if(data$str$Ward %>% length >= 2){
-      ward <- data$str$Ward
+
+      if(input$testPW == "Ag-RDT"){
+      senW = input$sensAg
+      speW = input$speAg
+      ttestPW = (as.numeric(strftime(input$tAg, "%M"))/60 + as.numeric(strftime(input$tAg, "%H")))/24
+      } else {
+        senW = input$sensPCR
+        speW = input$spePCR
+        ttestPW = (as.numeric(strftime(input$tPCR, "%M"))/60 + as.numeric(strftime(input$tPCR, "%H")))/24
+      }
+
+      if(input$testH == "Ag-RDT"){
+        senH = input$sensAg
+        speH = input$speAg
+        ttestHW = (as.numeric(strftime(input$tAg, "%M"))/60 + as.numeric(strftime(input$tAg, "%H")))/24
+      } else {
+        senH = input$sensPCR
+        speH = input$spePCR
+        ttestHW = (as.numeric(strftime(input$tPCR, "%M"))/60 + as.numeric(strftime(input$tPCR, "%H")))/24
+      }
+
+      if(input$testsymp == "Ag-RDT"){
+        sensymp = input$sensAg
+        spesymp = input$speAg
+        ttestsymp = (as.numeric(strftime(input$tAg, "%M"))/60 + as.numeric(strftime(input$tAg, "%H")))/24
+      } else {
+        sensymp = input$sensPCR
+        spesymp = input$spePCR
+        ttestsymp = (as.numeric(strftime(input$tPCR, "%M"))/60 + as.numeric(strftime(input$tPCR, "%H")))/24
+      }
+
+      if(input$testSA == "Ag-RDT"){
+        senSA = input$sensAg
+        speSA = input$speAg
+      } else {
+        senSA = input$sensPCR
+        speSA = input$spePCR
+      }
+      # ttestSA
+      # as.numeric(strftime(t, "%H"))/60 + strftime(t, "%M")
+
+      # if no screening strategy >> probability to be tested is null
+      if(input$screenstrP == 1){
+        ptestPWNI = input$ptestPWNI # probability to test NI patients in the ward
+        ptestPWLI = input$ptestPWLI # probability to test PI patients in the ward
+        ptestPWHI = input$ptestPWHI # probability to test FI patients in the ward
+      } else {
+        ptestPWNI = 0 # probability to test NI patients in the ward
+        ptestPWLI = 0 # probability to test PI patients in the ward
+        ptestPWHI = 0 # probability to test FI patients in the ward
+      }
+
+      if(input$screenstrH == 1){
+        ptestHNI = input$ptestHNI # probability to test NI HCWS
+        ptestHLI = input$ptestHLI # probability to test PI HCWS
+        ptestHHI = input$ptestHHI # probability to test FI HCWS
+      } else {
+        ptestHNI = 0 # probability to test NI HCWS
+        ptestHLI = 0 # probability to test PI HCWS
+        ptestHHI = 0 # probability to test FI HCWS
+      }
+
+
+      gdata <- build_gdata(
+        ##### Infection
+        n_ctcH_PSA = input$n_ctcH_PSA,
+        t_ctcH_PSA = (as.numeric(strftime(input$t_ctcH_PSA, "%M"))/60 + as.numeric(strftime(input$t_ctcH_PSA, "%H")))/24,
+        n_ctcP_PSA = input$n_ctcH_PSA,
+        t_ctcP_PSA = (as.numeric(strftime(input$t_ctcP_PSA, "%M"))/60 + as.numeric(strftime(input$t_ctcP_PSA, "%H")))/24,
+        n_ctcH_PW = input$n_ctcH_PW,
+        t_ctcH_PW = (as.numeric(strftime(input$t_ctcH_PW, "%M"))/60 + as.numeric(strftime(input$t_ctcH_PW, "%H")))/24,
+        n_ctcP_PW = input$n_ctcP_PW,
+        t_ctcP_PW = (as.numeric(strftime(input$t_ctcP_PW, "%M"))/60 + as.numeric(strftime(input$t_ctcP_PW, "%H")))/24,
+        n_ctcH_H = input$n_ctcH_H,
+        t_ctcH_H = (as.numeric(strftime(input$t_ctcH_H, "%M"))/60 + as.numeric(strftime(input$t_ctcH_H, "%H")))/24,
+        t_ctcV_PW = (as.numeric(strftime(input$t_ctcV_PW, "%M"))/60 + as.numeric(strftime(input$t_ctcV_PW, "%H")))/24,
+        # daily incidence (https://www.gouvernement.fr/info-coronavirus/carte-et-donnees)
+        I = input$I/100000,
+        # disease duration (days)
+        d = 10,
+        #  basic reproduction number
+        R0 = input$R0, # https://www.gouvernement.fr/info-coronavirus/carte-et-donnees
+        tSA  = (as.numeric(strftime(input$tSA, "%M"))/60 + as.numeric(strftime(input$tSA, "%H")))/24, # average duration before full admission (in screening area for clinical exam, administrative procedure, etc)
+        tISO = input$tISO,   # average duration of confinement (isolated ward or contact restriction)
+        tIC  = input$tIC,   # average duration of stay in intensive care
+        tSL  = input$tSLs[1],   # average duration of sick leave
+        tESL = input$tSLs[2],   # average duration of extended sick leave
+        tE  = input$tE, # duration epidemiological state E
+        tEA = input$tEA, # duration epidemiological state EA
+        tES = input$tES, # duration epidemiological state ES
+        tIA = input$tIA, # duration epidemiological state IA
+        tIM = input$tIM, # duration epidemiological state IM
+        tIS = input$tIS, # duration epidemiological state IS
+        tLI = input$tLI, # duration of partial immunity before return to non immune status
+        tHI = input$tHI, # duration of full immunity before return to partial immune status
+        # patient protection
+        epsPPSA = input$epsPPSA %>% as.numeric,
+        epsHPSA = input$epsHPSA %>% as.numeric,
+        epsHPW = input$epsHPW %>% as.numeric,
+        epsPPW = input$epsPPW %>% as.numeric,
+        epsVPW = input$epsVPW %>% as.numeric,
+        # healthcare workers protection
+        epsPHSA = input$epsPHSA %>% as.numeric, #from patient in SA
+        epsPHW = input$epsPHW %>% as.numeric, #from patient in W
+        epsHHW = input$epsHHW %>% as.numeric, #from HW in W
+        ## Test in ward
+        ttestSA = (as.numeric(strftime(input$ttestSA, "%M"))/60 + as.numeric(strftime(input$ttestSA, "%H")))/24, # test duration in screening area
+        ttestPW = ttestPW, # test duration in ward for screening patients
+        ttestHW = ttestHW, # test duration in ward for screening professionals
+        ttestsymp = ttestsymp, # test duration for symptomatic
+
+        tbtwtestP = input$tbtwtestP, # duration between two tests for patient
+        tbtwtestH = input$tbtwtestH, # duration between two tests for HCWS
+
+        tbeftestPsymp = input$tbeftestPsymp/24, # duration before test of symp patient
+        tbeftestHsymp = input$tbeftestHsymp/24, # duration before test of symp HCWS
+
+        psympNI = input$psympNI, # probability to be symptomatic when non immune
+        psympLI = input$psympLI, # probability to be symptomatic when partially immune
+        psympHI = input$psympHI, # probability to be symptomatic when fully immune
+
+        psevNI = input$psevNI, # probability to develop severe symptoms when non immune
+        psevLI = input$psevLI, # probability to develop severe symptoms when partially immune
+        psevHI = input$psevHI, # probability to develop severe symptoms when fully immune
+
+        pSL = input$pSL/100, # probability to take sick leave
+        pESL = input$pESL/100, # probability to take extended sick leave
+        pSLT = input$pSLT/100, # probability to take EL/ESL after positive test
+
+        pIC = input$pIC/100, # probability to be transfer in intensive care
+        pdieIC = input$pdieIC/100, # probability to die in intensive care
+
+        ###################################
+        pLI = input$pLI, # probability to be PI at the admission (proportion of PI in the population)
+        pHI = input$pHI, # probability to be FI at the admission (proportion of FI in the population)
+        hNI2LI = input$hNI2LI, # daily probability to become partially immune
+        hLI2HI = input$hLI2HI, # daily probability to become fully immune
+
+        rinfLI = input$rinfLI, # partial immunity efficiency % FIX ME better explain that this is the ratio of reduction of probability to be infected compared to non immune
+        rinfHI = input$rinfHI, # partial immunity efficiency % FIX ME better explain that this is the ratio of reduction of probability to be infected compared to non immune
+
+        rsymp = input$rsymp, # Ratio adjusting probability of symptoms for patients compared to general population (professionals)
+        rsev = input$rsev, # Ratio adjusting probability of severity if symptoms for patients compared to general population (professionals)
+
+        ptestPSAsymp = input$ptestPSAsymp, # probability to test symptomatic patients in the screening area
+        ptestPSANI = input$ptestPSANI,  # probability to test NI patients in the screening area
+        ptestPSALI = input$ptestPSALI, # probability to test PI patients in the screening area
+        ptestPSAHI = input$ptestPSAHI, # probability to test FI patients in the screening area
+
+        ptestPWsymp = input$ptestPWsymp/100, # probability to test symptomatic patients in the ward
+        ptestPWNI = ptestPWNI,# probability to test NI patients in the ward
+        ptestPWLI = ptestPWLI, # probability to test PI patients in the ward
+        ptestPWHI = ptestPWHI, # probability to test FI patients in the ward
+
+        ptestHsymp = input$ptestHsymp/100, # probability to test symptomatic HCWS in the ward
+        ptestHNI = ptestHNI, # probability to test NI HCWS
+        ptestHLI = ptestHLI, # probability to test PI HCWS
+        ptestHHI = ptestHHI, # probability to test FI HCWS
+
+        senSA = senSA,
+        speSA = speSA,
+        senW = senW,
+        speW = speW,
+        senH = senH,
+        speH = senH,
+        sensymp = sensymp,
+        spesymp = spesymp
+      )
+
+      ward_names <- data$str$Ward
       pop_size_P <- data$str$P %>% as.numeric
       pop_size_H <- data$str$H %>% as.numeric
-      nVisits <- data$str$Visits %>% as.numeric %>% divide_by(7)
-      LS <- data$str$Turnover %>% as.numeric # FIX ME adjust
-      if(input$airlockEffective)
-        nHCWS_AL <- input$nHCWS_AL
+      nVisits <- data$str$Visits %>% as.numeric %>% divide_by(7) # FIX ME check accuracy
+      LS <- data$str$Turnover %>% as.numeric %>% divide_by(7) # FIX ME adjust
 
-      IMMstate <- data$IMMstate
-
-      save(ward, file = "ward.Rda")
-      save(pop_size_P, file = "pop_size_P.Rda")
-      save(pop_size_H, file = "pop_size_H.Rda")
-      save(nVisits, file = "nVisits.Rda")
-      save(LS, file = "LS.Rda")
-      save(IMMstate, file = "IMMstate.Rda")
-
-      xstart <- startvec(ward_names = ward,
-                         pop_size_P = pop_size_P,
-                         pop_size_H = pop_size_H,
-                         nVisits = nVisits,
-                         LS = LS,
-                         IMMstate = IMMstate %>% as.data.frame,
-                         # EPIstate = data$EPIstate,
-                         AL = input$airlockEffective,
-                         AL_nHCWS = nHCWS_AL)
-
-      # print(xstart)
-
-      # nombre de contacts
-      # βPP = βPH = β, βHH = 0.25 × β and βHP = (Nh/Np) × β
-      # 0.25 >> un soignant est là 25% du temps (42h / semaine)
-      # Np x βHP = Nh × βPH >> nombre de contacts reciproque soignants vers patient et patients vers soignants
-      # FIX ME:
-      # β >> nombre de contact/pers x durée moyenne de contact x proba de transmission / unité de temps
-
-      if(isFALSE(input$allBetaW)){
-        betaPP     = input$betaPP
-        betaHH     = input$betaPP * 0.25
-        betaPH     = input$betaPP
-        betaHP     = input$betaPP
-      } else {
-        betaPP     = input$betaPP
-        betaHH     = input$betaHH
-        betaPH     = input$betaPH
-        betaHP     = input$betaHP
-      }
-
-      if(isFALSE(input$allBetaAL)){
-        betaPP_AL     = input$betaPP_AL
-        betaHH_AL     = input$betaPP_AL * 0.25
-        betaPH_AL     = input$betaPP_AL
-        betaHP_AL     = input$betaPP_AL
-      } else {
-        betaPP_AL     = input$betaPP_AL
-        betaHH_AL     = input$betaHH_AL
-        betaPH_AL     = input$betaPH_AL
-        betaHP_AL     = input$betaHP_AL
-      }
-
-      params_dataset = list(
-        betaPP     = betaPP,
-        betaHH     = betaHH,
-        betaPH     = betaPH,
-        betaHP     = betaHP,
-        betaVP     = input$betaVP,
-        betaPP_AL  = betaPP_AL,
-        betaHH_AL  = betaHH_AL,
-        betaPH_AL  = betaPH_AL,
-        betaHP_AL  = betaHP_AL,
-        Ta = input$Ta,
-        gamma1 = 1/ input$gamma1,
-        gamma2 = 1/ input$gamma2,
-        gamma3 = 1/ input$gamma3,
-        gamma4 = 1/ input$gamma4,
-        gamma5 = 1/ input$gamma5,
-        gammaT = 1/ input$gammaT,
-        gammaBSL = 1/ input$gammaBSL,
-        gammaSL = 1/ input$gammaSL[1],
-        gammaESL = 1/ input$gammaSL[2],
-        gammapreIso = 1 / input$gammapreIso,
-        gammaIso = 1 / input$gammaIso,
-        timeExCli = input$timeExCli,
-        timeTest = input$timeTest,
-        nHCWS_AL = input$nHCWS_AL,
-        p = input$p / 100,
-        p2 = input$p2 / 100,
-        p2p = input$p2p / 100,
-        pDIC = input$pDIC / 100,
-        pD = input$pD / 100,
-        pT = input$pT / 100,
-        pSL = input$pSL / 100,
-        pESL = input$pESL / 100,
-        sensInf = input$sensInf,
-        sensNInf = input$sensNInf,
-        sensInfAnt = input$sensInfAnt,
-        sensIncInfAnt = input$sensIncInfAnt,
-        sensIncInf = input$sensIncInf,
-        PrevCom = input$PrevCom,
-        PrevVacc = input$PrevVacc,
-        propV1 = input$propV1,
-        propV2 = input$propV2,
-        pv1p = input$pv1p,
-        pv1h = input$pv1h,
-        pv2p = input$pv2p,
-        pv2h = input$pv2h,
-        gammav1 = input$gammav1,
-        gammav2 = input$gammav2,
-        pInfV1 = input$pInfV1,
-        pInfV2 = input$pInfV2,
-        psv = input$psv,
-        p2pv = input$p2pv,
-        p2v = input$p2v,
-        pDv = input$pDv,
-        pTv = input$pTv,
-        gammaVin = input$gammaVin, ### FIX ME
-        gammaVout = input$gammaVout ### FIX ME
-      )
+      # IMMstate <- data$IMMstate ## FIX ME: check and use
 
       contacts <- t(data$TS[, ! names(data$TS) %in% c("Worker", "Ward")])
       colnames(contacts) <- data$TS[,1]
 
       matContact <- mwss::timeShare(contacts, namesincol1 = FALSE)
 
-      params_dataset %<>% lapply(., as.numeric)
+      n_days <- input$n_days %>% seq
 
-      # print(params_dataset)
-      # print(xstart)
-      # print(matContact)
-      # print(input$n_sim)
-      # print(input$n_days)
-      # print(input$isoWard)
-      # print(input$airlockEffective)
-      # print(input$scenario)
-      # print(input$test_str)
-      # print(input$Vaccination)
+      IMMstate = NULL
+      EPIstate = NULL
 
-      save(params_dataset, file = "data/test_data/params_dataset.Rda" )
-      save(xstart, file = "data/test_data/xstart.Rda")
-      save(matContact, file = "data/test_data/matContact.Rda")
+      if(input$SA == 1) SA = TRUE else SA = FALSE
+      nH_SA = input$nH_SA
+
+      test = TRUE
+
+      save(ward_names, file = "tmpdata/ward_names.Rda")
+      save(pop_size_P, file = "tmpdata/pop_size_P.Rda")
+      save(pop_size_H, file = "tmpdata/pop_size_H.Rda")
+      save(nVisits, file = "tmpdata/nVisits.Rda")
+      save(LS, file = "tmpdata/LS.Rda")
+      save(matContact, file = "tmpdata/matContact.Rda")
+      save(IMMstate, file = "tmpdata/IMMstate.Rda")
+      save(EPIstate,  file = "tmpdata/EPIstate.Rda")
+      save(SA,  file = "tmpdata/SA.Rda")
+      save(nH_SA,  file = "tmpdata/nH_SA.Rda")
+      save(test,  file = "tmpdata/test.Rda")
+      save(gdata,  file = "tmpdata/gdata.Rda")
+      save(n_days,  file = "tmpdata/n_days.Rda")
+
+      mwssmodel <- mwss(ward_names,
+                    pop_size_P,
+                    pop_size_H,
+                    nVisits,
+                    LS,
+                    matContact = matContact,
+                    IMMstate = NULL,
+                    EPIstate = NULL,
+                    SA = SA,
+                    nH_SA = nH_SA,
+                    gdata = gdata,
+                    tspan =  n_days,
+                    verbose = FALSE)
+
       n_sim <- input$n_sim
-      save(n_sim, file = "data/test_data/n_sim.Rda")
-      n_days <- input$n_days
-      save(n_days, file = "data/test_data/n_days.Rda")
-      isoWard <- input$isoWard
-      save(isoWard, file = "data/test_data/isoWard.Rda")
-      airlockEffective <- input$airlockEffective
-      save(airlockEffective, file = "data/test_data/airlockEffective.Rda")
-      scenario <- input$scenario
-      save(scenario, file = "data/test_data/scenario.Rda")
-      test_str <- input$test_str
-      save(test_str, file = "data/test_data/test_str.Rda")
-      Vaccination <- input$Vaccination
-      save(Vaccination, file = "data/test_data/Vaccination.Rda")
 
-      if(input$scenario == "FALSE")
-        output <- mwss(params_dataset,
-                       xstart,
-                       matContact,
-                       nSimulations = input$n_sim,
-                       duration = input$n_days,
-                       isoWard = input$isoWard,
-                       airlockEffective = input$airlockEffective,
-                       scenario =  FALSE,
-                       test_str = input$test_str,
-                       Vaccination = input$Vaccination) else
-                         output <- mwss(params_dataset,
-                                        xstart,
-                                        matContact,
-                                        nSimulations = input$n_sim,
-                                        duration = input$n_days,
-                                        isoWard = input$isoWard,
-                                        airlockEffective = input$airlockEffective,
-                                        scenario =  input$scenario,
-                                        test_str = input$test_str,
-                                        Vaccination = input$Vaccination)
+      save(n_sim,  file = "tmpdata/n_sim.Rda")
 
-      save(output, file = "data/test_data/output.Rda")
-      output
+      trajmwss <- multisim(mwssmodel, n_sim)
+
+      save(trajmwss,  file = "tmpdata/trajmwss.Rda")
+
+      trajmwss
 
     } else {
       # FIX ME POP UP WINDOW
@@ -1361,36 +1430,76 @@ server <- function(input, output, session) {
 
   # value boxes
 
+
   ###### Probability of outbreak
+  ## nosocomial infections
+
+    output$nosoH <- renderValueBox({
+      valueBox(
+        ifelse(class(runmodel()) == "mwss", summary(runmodel(),
+                                                    scale = 0,
+                                                    focus = "infections")$H$quantiles_noso[["50%"]], ""),
+        HTML("Number of nosocomial  <br/> infection among professionals"),
+        icon = icon("user-md"), color = "red", width=NULL)
+    })
+
+    output$nosoP <- renderValueBox({
+      valueBox(
+        ifelse(class(runmodel()) == "mwss", summary(runmodel(),
+                                                    scale = 0,
+                                                    focus = "infections")$P$quantiles_noso[["50%"]], ""),
+        HTML("Number of nosocomial  <br/> infection among patients"),
+        icon = icon("bed"), color = "red", width=NULL)
+    })
+
+    # number of test FIX ME split patient / HCWS
+    output$ntestP <- renderValueBox({
+      valueBox(
+        ifelse(class(runmodel()) == "mwss", summary(runmodel(),
+                                                    scale = 0,
+                                                    focus = "test")$quantilesP[["50%"]], ""),
+        HTML("Number of tests of patients <br/> "),
+        icon = icon("exclamation-triangle"), color = "yellow", width=NULL)
+    })
+
+    output$ntestH <- renderValueBox({
+      valueBox(
+        ifelse(class(runmodel()) == "mwss", summary(runmodel(),
+                                                    scale = 0,
+                                                    focus = "test")$quantilesH[["50%"]], ""),
+        HTML("Number of tests of professionals <br/> "),
+        icon = icon("exclamation-triangle"), color = "yellow", width=NULL)
+    })
 
 
-  ###### Average number of transmissions
-  output$nTransmission <- renderValueBox({
-    valueBox(summary(runmodel(), input$test_str)$TrSec$quantiles[["50%"]],
-             "Median number of contaminations inside the facility",
-             icon = icon("fire"), color = "yellow", width=NULL)
-  })
+    # number of severe cases
+    output$nSev <- renderValueBox({
+      valueBox(
+        ifelse(class(runmodel()) == "mwss", summary(runmodel(),
+                                                    scale = 0,
+                                                    focus = "incidence")$incidence[, incPS] %>%  median, ""),
+        HTML("Number of severe cases <br/>among patients"),
+        icon = icon("fire"), color = "red", width=NULL)
+    })
 
-  ###### Number of test
-  output$nTest <- renderValueBox({
-    valueBox(summary(runmodel(), input$test_str)$nTestsHosp$quantiles[["50%"]],
-             "Median number of tests performed in the facility", icon = icon("exclamation-triangle"), color = "orange", width=NULL)
-  })
+    # number of severe cases
+    output$ISO <- renderValueBox({
+      valueBox(
+        ifelse(class(runmodel()) == "mwss", summary(runmodel(),
+                                                    scale = 0)$ISO$quantiles[["50%"]], ""),
+        HTML("Maximal number of beds <br/>simulataneously under confinement"),
+        # "Maximal number of beds simulataneously under confinement",
+        icon = icon("bed"), color = "green", width=NULL)
+    })
 
-  ###### Incidences
-  #### Patients
-  output$incidenceP <- renderValueBox({
-    valueBox(summary(runmodel(), input$test_str)$incidence$quantiles["50%","P"],
-             "Median incidence among patients",
-             icon = icon("bed"), color = "green", width=NULL)
-  })
-
-  #### HCWS
-  output$incidenceH <- renderValueBox({
-    valueBox(summary(runmodel(), input$test_str)$incidence$quantiles["50%","H"],
-             "Median incidence among healthcare workers",
-             icon = icon("user-md"), color = "green", width=NULL)
-  })
+    # number of severe cases
+    output$SL <- renderValueBox({
+      valueBox(
+        ifelse(class(runmodel()) == "mwss", summary(runmodel(),
+                                                    scale = 0)$SL$quantiles[["50%"]], ""),
+        HTML("Maximal number of professionals <br/>simulataneously in sick leave"),
+        icon = icon("user-md"), color = "green", width=NULL)
+    })
 
   #########
   ######### Network plot
@@ -1403,105 +1512,191 @@ server <- function(input, output, session) {
 
     matContact <- mwss::timeShare(contacts, namesincol1 = FALSE)
 
-    plot_pOutbreak(runmodel(), matContact, data$str$P)#, verbose = FALSE)
-
+    plot_pOutbreak(runmodel(), matContact, data$str$P,
+                   outb_Thhold = input$outb_Thhold,
+                   addtitle = TRUE, verbose = FALSE)
   })
+
+    output$nosoHazard <- renderPlot({
+
+      contacts <- t(data$TS[, ! names(data$TS) %in% c("Worker", "Ward")])
+      colnames(contacts) <- data$TS[,1]
+
+      matContact <- mwss::timeShare(contacts, namesincol1 = FALSE)
+
+      plot_nosoHazard(runmodel(), matContact, data$str$P,
+                     addtitle = TRUE, verbose = FALSE)
+    })
+
+
+    #########
+    ######### Cummulative incidences
+    #########
+
+    output$iter_choiceInc <- renderUI({
+      selectInput(inputId = "iter_inc",
+                  label = "Select a simulation",
+                  choices = seq(input$n_sim))
+    })
+
+    output$ward_choiceInc <- renderUI({
+      selectInput(inputId="ward_inc",
+                  label="Select a ward",
+                  choices = data$str$Ward)
+    })
+
+    output$plotIncidence <- renderPlot({
+
+      ward = FALSE
+
+      if(input$scaleInc == 1 & isTRUE(input$wardInc))
+        ward = input$ward_inc
+
+      if(input$iterInc == 1)
+        iter = input$iter_inc %>% as.numeric else
+          iter = FALSE
+
+      if(input$popInc == "P+H")
+        pop = FALSE else
+          pop = input$popInc
+
+      plot_incidence(runmodel(),
+                     scale = input$scaleInc,
+                     pop = pop,
+                     iter = iter,
+                     ward = ward,
+                     display_sd = input$display_sdInc)
+    })
 
   #########
   ######### Daily test boxplot
   #########
 
-  output$plotDailyTest <- renderPlot({
+    output$iter_choiceTest <- renderUI({
+      selectInput(inputId = "iter_test",
+                  label = "Select a simulation",
+                  choices = seq(input$n_sim))
+    })
 
-    plotDailyTest(summary(runmodel(), input$test_str)$nDailyTestsHosp$perSim, startday = FALSE)
+    output$ward_choiceTest <- renderUI({
+      selectInput(inputId="ward_test",
+                  label="Select a ward",
+                  choices = data$str$Ward)
+    })
 
-  })
+    output$daysint_choiceTest <- renderUI({
+      numericInput(
+        'daysint',
+        'Calculate median of daily number of test over n-days periods',
+        value = 1,
+        min = 0,
+        max = input$n_days,
+        step = 1
+      )
+    })
 
-  output$plotIncidence <- renderPlot({
-    plotcumInc(runmodel())
-  })
 
-  #########
-  ######### Trajectories of cumulative incidences ?
-  #########
+    output$plottest <- renderPlot({
 
+      ward = FALSE
+
+      if(input$scaleTest == 1 & isTRUE(input$wardTest))
+        ward = input$ward_test
+
+
+      if(input$iterTest == 1)
+        iter = input$iter_test %>% as.numeric else
+          iter = FALSE
+
+        if(input$popTest == "P+H")
+          pop = NULL else
+            pop = input$popTest
+
+
+        if(input$agrtest == 0)
+        daysint = 1 else
+          daysint = input$daysint
+
+        plot_test(runmodel(), daysint = daysint, iter = iter, ward = ward, pop = pop, scale = input$scaleTest)
+
+    })
 
 
   ############
-  ### Test section
+  ### Test section // parameters
   ############
 
 
-  observeEvent(input$variant_id,{
-
-    params_dataset <- paste0(input$variant_id, "Params") %>% get
-
-    # EPI
-    updateNumericInput(session, 'PrevCom', value = params_dataset$PrevCom)
-    updateSliderInput(session, "p", value = params_dataset$p*100)
-    updateSliderInput(session, "p2", value = params_dataset$p2*100)
-    updateSliderInput(session, "p2p", value = params_dataset$p2p*100)
-    updateSliderInput(session, 'pDIC', value = params_dataset$pDIC*100)
-    updateSliderInput(session, 'pD', value = params_dataset$pD*100)
-    updateSliderInput(session, 'pT', value = params_dataset$pT)
-    updateSliderInput(session, 'pSL', value = params_dataset$pSL)
-    updateSliderInput(session, 'pESL', value = params_dataset$pESL)
-    updateNumericInput(session, 'gamma1', value = params_dataset$gamma1)
-    updateNumericInput(session, 'gamma2', value = params_dataset$gamma2)
-    updateNumericInput(session, 'gamma3', value = params_dataset$gamma3)
-    updateNumericInput(session, 'gamma4', value = params_dataset$gamma4)
-    updateNumericInput(session, 'gamma5', value = params_dataset$gamma5)
-    updateNumericInput(session, 'gammaT', value = params_dataset$gammaT)
-    updateNumericInput(session, 'gammaBSL', value = params_dataset$gammaBSL)
-    updateSliderInput(session, "gammaSL", value = c(params_dataset$gammaSL, params_dataset$gammaESL))
-    updateNumericInput(session, 'Ta', value = params_dataset$Ta)
-    updateNumericInput(session, 'betaPP', value = params_dataset$betaPP)
-    updateNumericInput(session, 'betaPH', value = params_dataset$betaPH)
-    updateNumericInput(session, 'betaHH', value = params_dataset$betaHH)
-    updateNumericInput(session, 'betaHP', value = params_dataset$betaHP)
-    updateNumericInput(session, 'betaVP', value = params_dataset$betaVP)
-
-    # Test
-    updateNumericInput(session, 'sensInf', value = params_dataset$sensInf)
-    updateNumericInput(session, 'sensNInf', value = params_dataset$sensNInf)
-    updateNumericInput(session, 'sensInfAnt', value = params_dataset$sensInfAnt)
-    updateNumericInput(session, 'sensIncInfAnt', value = params_dataset$sensIncInfAnt)
-    updateNumericInput(session, 'sensIncInf', value = params_dataset$sensIncInf)
-
-    # Vaccination
-    updateNumericInput(session, 'PrevVacc', value = params_dataset$PrevVacc)
-    updateNumericInput(session, 'propV1', value = params_dataset$propV1)
-    updateNumericInput(session, 'propV2', value = params_dataset$propV2)
-    updateNumericInput(session, 'pv1p', value = params_dataset$pv1p)
-    updateNumericInput(session, 'pv1h', value = params_dataset$pv1h)
-    updateNumericInput(session, 'pv2p', value = params_dataset$pv2p)
-    updateNumericInput(session, 'pv2h', value = params_dataset$pv2h)
-    updateNumericInput(session, 'gammav1', value = params_dataset$gammav1)
-    updateNumericInput(session, 'gammav2', value = params_dataset$gammav2)
-    updateNumericInput(session, 'pInfV1', value = params_dataset$pInfV1)
-    updateNumericInput(session, 'pInfV2', value = params_dataset$pInfV2)
-    updateNumericInput(session, 'psv', value = params_dataset$psv)
-    updateNumericInput(session, 'p2pv', value = params_dataset$p2pv)
-    updateNumericInput(session, 'p2v', value = params_dataset$p2v)
-    updateNumericInput(session, 'pDv', value = params_dataset$pDv)
-    updateNumericInput(session, 'pTv', value = params_dataset$pTv)
-
-    # Surveillance and control
-    updateNumericInput(session, 'gammapreIso', value = params_dataset$gammapreIso)
-    updateNumericInput(session, 'gammaIso', value = params_dataset$gammaIso)
-    updateNumericInput(session, 'nHCWS_AL', value = params_dataset$nHCWS_AL)
-    updateNumericInput(session, 'timeExCli', value = params_dataset$timeExCli)
-    updateNumericInput(session, 'timeTest', value = params_dataset$timeTest)
-    updateNumericInput(session, 'betaPP_AL', value = params_dataset$betaPP_AL)
-    updateNumericInput(session, 'betaPH_AL', value = params_dataset$betaPH_AL)
-    updateNumericInput(session, 'betaHH_AL', value = params_dataset$betaHH_AL)
-    updateNumericInput(session, 'betaHP_AL', value = params_dataset$betaHP_AL)
-    # updateNumericInput(session, 'regHtint', value = params_dataset$regHtint)
-    # updateNumericInput(session, 'regPtint', value = params_dataset$regPtint)
-    updateNumericInput(session, 'sensInf', value = params_dataset$sensInf)
-    updateNumericInput(session, 'sensNInf', value = params_dataset$sensNInf)
-
-  })
+  # observeEvent(input$variant_id,{
+  #
+  #   params_dataset <- paste0(input$variant_id, "Params") %>% get
+  #
+  #   # EPI
+  #   updateNumericInput(session, 'PrevCom', value = params_dataset$PrevCom)
+  #   updateSliderInput(session, "p", value = params_dataset$p*100)
+  #   updateSliderInput(session, "p2", value = params_dataset$p2*100)
+  #   updateSliderInput(session, "p2p", value = params_dataset$p2p*100)
+  #   updateSliderInput(session, 'pDIC', value = params_dataset$pDIC*100)
+  #   updateSliderInput(session, 'pD', value = params_dataset$pD*100)
+  #   updateSliderInput(session, 'pT', value = params_dataset$pT)
+  #   updateSliderInput(session, 'pSL', value = params_dataset$pSL)
+  #   updateSliderInput(session, 'pESL', value = params_dataset$pESL)
+  #   updateNumericInput(session, 'gamma1', value = params_dataset$gamma1)
+  #   updateNumericInput(session, 'gamma2', value = params_dataset$gamma2)
+  #   updateNumericInput(session, 'gamma3', value = params_dataset$gamma3)
+  #   updateNumericInput(session, 'gamma4', value = params_dataset$gamma4)
+  #   updateNumericInput(session, 'gamma5', value = params_dataset$gamma5)
+  #   updateNumericInput(session, 'gammaT', value = params_dataset$gammaT)
+  #   updateNumericInput(session, 'gammaBSL', value = params_dataset$gammaBSL)
+  #   updateSliderInput(session, "gammaSL", value = c(params_dataset$gammaSL, params_dataset$gammaESL))
+  #   updateNumericInput(session, 'Ta', value = params_dataset$Ta)
+  #   updateNumericInput(session, 'betaPP', value = params_dataset$betaPP)
+  #   updateNumericInput(session, 'betaPH', value = params_dataset$betaPH)
+  #   updateNumericInput(session, 'betaHH', value = params_dataset$betaHH)
+  #   updateNumericInput(session, 'betaHP', value = params_dataset$betaHP)
+  #   updateNumericInput(session, 'betaVP', value = params_dataset$betaVP)
+  #
+  #   # Test
+  #   updateNumericInput(session, 'sensInf', value = params_dataset$sensInf)
+  #   updateNumericInput(session, 'sensNInf', value = params_dataset$sensNInf)
+  #   updateNumericInput(session, 'sensInfAnt', value = params_dataset$sensInfAnt)
+  #   updateNumericInput(session, 'sensIncInfAnt', value = params_dataset$sensIncInfAnt)
+  #   updateNumericInput(session, 'sensIncInf', value = params_dataset$sensIncInf)
+  #
+  #   # Vaccination
+  #   updateNumericInput(session, 'PrevVacc', value = params_dataset$PrevVacc)
+  #   updateNumericInput(session, 'propV1', value = params_dataset$propV1)
+  #   updateNumericInput(session, 'propV2', value = params_dataset$propV2)
+  #   updateNumericInput(session, 'pv1p', value = params_dataset$pv1p)
+  #   updateNumericInput(session, 'pv1h', value = params_dataset$pv1h)
+  #   updateNumericInput(session, 'pv2p', value = params_dataset$pv2p)
+  #   updateNumericInput(session, 'pv2h', value = params_dataset$pv2h)
+  #   updateNumericInput(session, 'gammav1', value = params_dataset$gammav1)
+  #   updateNumericInput(session, 'gammav2', value = params_dataset$gammav2)
+  #   updateNumericInput(session, 'pInfV1', value = params_dataset$pInfV1)
+  #   updateNumericInput(session, 'pInfV2', value = params_dataset$pInfV2)
+  #   updateNumericInput(session, 'psv', value = params_dataset$psv)
+  #   updateNumericInput(session, 'p2pv', value = params_dataset$p2pv)
+  #   updateNumericInput(session, 'p2v', value = params_dataset$p2v)
+  #   updateNumericInput(session, 'pDv', value = params_dataset$pDv)
+  #   updateNumericInput(session, 'pTv', value = params_dataset$pTv)
+  #
+  #   # Surveillance and control
+  #   updateNumericInput(session, 'gammapreIso', value = params_dataset$gammapreIso)
+  #   updateNumericInput(session, 'gammaIso', value = params_dataset$gammaIso)
+  #   updateNumericInput(session, 'nHCWS_AL', value = params_dataset$nHCWS_AL)
+  #   updateNumericInput(session, 'timeExCli', value = params_dataset$timeExCli)
+  #   updateNumericInput(session, 'timeTest', value = params_dataset$timeTest)
+  #   updateNumericInput(session, 'betaPP_AL', value = params_dataset$betaPP_AL)
+  #   updateNumericInput(session, 'betaPH_AL', value = params_dataset$betaPH_AL)
+  #   updateNumericInput(session, 'betaHH_AL', value = params_dataset$betaHH_AL)
+  #   updateNumericInput(session, 'betaHP_AL', value = params_dataset$betaHP_AL)
+  #   # updateNumericInput(session, 'regHtint', value = params_dataset$regHtint)
+  #   # updateNumericInput(session, 'regPtint', value = params_dataset$regPtint)
+  #   updateNumericInput(session, 'sensInf', value = params_dataset$sensInf)
+  #   updateNumericInput(session, 'sensNInf', value = params_dataset$sensNInf)
+  #
+  # })
 
 
   ############

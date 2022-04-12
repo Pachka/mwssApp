@@ -10,11 +10,11 @@ library(shinyjs)
 library(plotly)
 library(magrittr)
 library(mwss)
-library(magrittr)
+library(SimInf)
 library(data.table)
 library(shinyWidgets)
 library(shinyhelper)
-
+library(shinyTime)
 
 # Parameters dataset
 # source('data/params_dataset.R', local = TRUE)
@@ -31,6 +31,7 @@ source('functions/buttonsUI.R', local = TRUE)
 source('functions/addWardbutton.R', local = TRUE)
 source('functions/editWardbutton.R', local = TRUE)
 source('functions/deleteWardbutton.R', local = TRUE)
+source('functions/editplanningbutton.R', local = TRUE)
 
 # App Structure function
 

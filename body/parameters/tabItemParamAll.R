@@ -4,325 +4,280 @@
 ##################################
 ##################################
 
-tabItemParamAll <- function(){
-
+tabItemParamAll <- function() {
   tabItem("allparams",
           fluidRow(
-            h3("The parameters appearing here were define using litterature review and parameters estimation statistical approaches."),
-            box(title = "Epidemiological parameters in the general population",
-                checkboxInput("simP", "Use simulated prevalences and proportion of vaccinated individuals", value = FALSE, width = NULL),
-                conditionalPanel(
-                  condition = "input.simP == 0",
-                  numericInput(
-                    'PrevCom',
-                    'Prevalence',
-                    value = params_dataset$PrevCom, min = 0, max = 1, step = 0.01
-                  ),
-                  numericInput(
-                    'pRecov',
-                    'Proportion of individuals who recovered in the last 2 months',
-                    value = 0, min = 0, max = 100, step = 1
-                  )),
-                conditionalPanel(
-                  condition = "input.simP == 1",
-                  dateInput("startSimP", "Simulate prevalences and vacc. proportions from:", value = "2022-01-01", format = "dd/mm/yy")
-                )
+            h3(
+              "The parameters appearing here were define using litterature review and parameters estimation statistical approaches."
             ),
-            box(title = "Epidemiological probabilities specific",
-                solidHeader = T,
-                sliderInput("p", label = 'Probability of symptoms', min = 0, max = 100,
-                                   value = params_dataset$p*100, post  = " %"),
-                column(width = 6,
-                       br(),
-                       h4("Health care workers"),
-                       sliderInput("p2", label = 'Probability of severity if symptoms', min = 0, max = 100,
-                                   value = params_dataset$p2*100, post  = " %"),
-                       sliderInput("pSL", label = 'Probability that HCWS takes SL after mild symptoms', min = 0, max = 100,
-                                   value = params_dataset$pSL*100, post  = " %"),
-                       sliderInput("pESL", label = 'Probability that HCWS takes ESL after mild symptoms', min = 0, max = 100,
-                                   value = params_dataset$pESL*100, post  = " %"),
-                       sliderInput("pD", label = 'Probability of dying after severe symptoms for HCWS', min = 0, max = 100,
-                                   value = params_dataset$pD*100, post  = " %")),
-                column(width = 6,
-                       br(),
-                       h4("Patients"),
-                       sliderInput("p2p", label = 'Probability of severity if symptoms for patients', min = 0, max = 100,
-                                   value = params_dataset$p2p*100, post  = " %"),
-                       sliderInput("pT", label = 'Probability of being transferred after severe symptoms', min = 0, max = 100,
-                                   value = params_dataset$pT*100, post  = " %"),
-                       sliderInput("pDIC", label = 'Probability of dying in intensive care after severe symptoms for patient', min = 0, max = 100,
-                                   value = params_dataset$pDIC*100, post  = " %"))
-            ),
-            box(
-              title = "Durations (day)",
-              solidHeader = T,
-              column(width = 6,
-                     numericInput(
-                       'gamma1',
-                       'Non-contagious incubation period',
-                       value = params_dataset$gamma1, min = 0, step = 0.5
-                     ),
-                     numericInput(
-                       'gamma2',
-                       'Contagious incubation period',
-                       value = params_dataset$gamma2, min = 0, step = 0.5
-                     ), numericInput(
-                       'gamma3',
-                       'Contagious period when asymptomatic and non severe symptoms',
-                       value = params_dataset$gamma3, min = 0, step = 0.5
-                     ),
-                     numericInput(
-                       'gamma4',
-                       'Contagious period when severe symptoms',
-                       value = params_dataset$gamma4, min = 0, step = 0.5
-                     ),
-                     numericInput(
-                       'gamma5',
-                       'Stay in intensive care before recovery or death',
-                       value = params_dataset$gamma5, min = 0, step = 0.5
-                     )),
-              column(width = 6,
-                     numericInput(
-                       'gammaT',
-                       'Contagious period before transfer when severe symptoms',
-                       value = params_dataset$gammaT, min = 0, step = 0.5
-                     ),
-                     numericInput(
-                       'gammaBSL',
-                       'Period before sick leave when mild symptoms',
-                       value = params_dataset$gammaBSL, min = 0, step = 0.5
-                     ),
-                     chooseSliderSkin("Flat"),
-                     sliderInput("gammaSL", label = 'Sick leave (simple and extended)', min = 0, max = 90,
-                                 value = c(params_dataset$gammaSL, params_dataset$gammaESL)),
-                     h3("Epidemiological parameter"),
-                     numericInput(
-                       'Ta',
-                       'Relative risk of transmission of asymptomatics compared to symptomatics',
-                       value = params_dataset$Ta, min = 0, step = 0.5
-                     ))
-            ),
-            box(
-              title = "Effective contact rates",
-              solidHeader = T,
-              numericInput(
-                'betaPP',
-                'From patient to patient',
-                value = params_dataset$betaPP, max = 1, min = 0, step = 0.01
+            tabsetPanel(
+              id = "tabs",
+              tabPanel(
+                title = "How to play",
+                strong("Introduction"),
+                p(
+                  "You are the CEO of a company that researches and sells consumer technology goods.
+          A new product has been invented. You, along with one competitor, are the first to market."
+                ),
+                img(src = 'howtoplay.png', id = "img_howtoplay"),
+                br(),
+                br(),
+                strong("Consumers"),
+                p(
+                  "You earn money by creating products that consumers like. Consumers are the
+          blocks at the top row. The number on each block tells you how many consumers are in it. A consumer block's
+          position indicates its dream product. All consumers like products with a high technology level.
+          But there are also differences in taste, shown by their different positions on the preference fit axis."
+                ),
+                strong("Products"),
+                p(
+                  "Filled circles represent products. Your first product (filled green circle) is already on the market. You can count the distance from a product to a consumer block. The closer a product, the more a consumer block
+          likes it. If a new product is closer to a consumer block than any previous product, the consumer block buys the product
+          and the product maker receives money equal to the number of consumers in the block."
+                ),
+                strong("Moves"),
+                p(
+                  "New products can be developed by improving the technology of the product
+          that you already have, or by changing its marketing. You can also imitate your competitor's latest product.
+          Possible moves are indicated by empty circles. The number atop indicates the cost."
+                ),
+                strong("End of the game"),
+                p(
+                  "The game ends when one producer makes a product that has the highest technology level (10). It
+          also ends if both producers decide they don't want to do anything one after another."
+                ),
+                icon = icon("question-circle")
               ),
-              checkboxInput("allBetaW", "Define all contact rates", value = FALSE, width = NULL),
-              conditionalPanel(condition = 'input.allBetaW == 1',
-                               numericInput(
-                                 'betaPH',
-                                 'From patient to healthcare worker',
-                                 value = params_dataset$betaPH, max = 1, min = 0, step = 0.01
-                               ),
-                               numericInput(
-                                 'betaHH',
-                                 'From healthcare worker to healthcare worker',
-                                 value = params_dataset$betaHH, max = 1, min = 0, step = 0.01
-                               ),
-                               numericInput(
-                                 'betaHP',
-                                 'From healthcare worker to patient',
-                                 value = params_dataset$betaHP, max = 1, min = 0, step = 0.01
-                               )),
-              numericInput(
-                'betaVP',
-                'From visitor to patient',
-                value = params_dataset$betaVP, max = 1, min = 0, step = 0.01
-              )),
-            column(width = 6,
-
-                                    h5("Here you can adjust sensitivity and specificity of the Ag-RDT tests."),
-                                    numericInput(
-                                      'sensInfAnt',
-                                      'sensitivity of Ag-RDT test when testing contagious individuals',
-                                      value = params_dataset$sensInfAnt, max = 1, min = 0, step = 0.01
-                                    ),
-                                    numericInput(
-                                      'sensIncInfAnt',
-                                      'sensitivity of Ag-RDT test when testing contagious individuals in incubation',
-                                      value = params_dataset$sensIncInfAnt, max = 1, min = 0, step = 0.01
-                                    )),
-            column(width = 6,
-                                    h5("Here you can adjust sensitivity and specificity of the RT-PCR tests."),
-                                    numericInput(
-                                      'sensInf',
-                                      'sensitivity of RT-PCR test when testing contagious individuals',
-                                      value = params_dataset$sensInf, max = 1, min = 0, step = 0.01
-                                    ),
-                                    numericInput(
-                                      'sensNInf',
-                                      'sensitivity of RT-PCR and Ag-RDT tests when testing non-contagious individuals',
-                                      value = params_dataset$sensNInf, max = 1, min = 0, step = 0.01
-                                    ),
-                                    numericInput(
-                                      'sensIncInf',
-                                      'sensitivity of RT-PCR test when testing contagious individuals in incubation',
-                                      value = params_dataset$sensIncInf, max = 1, min = 0, step = 0.01
-                                    ))
-          ,box(
-            title = "Vaccination",
-            solidHeader = T,
-            numericInput(
-              'PrevVacc',
-              'Proportion of vaccinated individuals',
-              value = params_dataset$PrevVacc, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'propV1',
-              'among those vaccinated, propotion with one dose (or can be interpreted as two doses',
-              value = params_dataset$propV1, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'propV2',
-              'among those vaccinated, proportion with two doses  (or can be interpreted as a booster shot)',
-              value = params_dataset$propV2, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pv1p',
-              'probability of taking first dose of vaccine for patients',
-              value = params_dataset$pv1p, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pv1h',
-              'probability of taking first dose of vaccine for HCWs',
-              value = params_dataset$pv1h, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pv2p',
-              'probability of taking second dose of vaccine for patients',
-              value = params_dataset$pv2p, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pv2h',
-              'probability of taking second dose of vaccine for HCWs',
-              value = params_dataset$pv2h, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'gammav1',
-              'duration (in days)  to attain V1 immunity',
-              value = params_dataset$gammav1, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'gammav2',
-              'duration (in days)  to attain V2 immunity',
-              value = params_dataset$gammav2, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pInfV1',
-              'probability of infection for partially vaccinated patients / HCWs',
-              value = params_dataset$pInfV1, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pInfV2',
-              'probability of infection for fully vaccinated patients / HCWs',
-              value = params_dataset$pInfV2, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'psv',
-              'probability of developing symptoms for those vaccinated',
-              value = params_dataset$psv, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'p2pv',
-              'probability of severe symptoms for vaccinated patients',
-              value = params_dataset$p2pv, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'p2v',
-              'probability of severe symptoms for vaccinated HCWs',
-              value = params_dataset$p2v, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pDv',
-              'probability of death for vaccinated HCWs with severe symptoms',
-              value = params_dataset$pDv, min = 0, max = 100, step = 1
-            ),
-            numericInput(
-              'pTv',
-              'probability of transfer to ICU for vaccinated patients with severe symptoms',
-              value = params_dataset$pTv, min = 0, max = 100, step = 1
-            )
-          ),
-            box(
-              title = "Test effectiveness",
-              solidHeader = T,
-              numericInput(
-                'sensInf',
-                'sensitivity of RT-PCR test when testing contagious individuals',
-                value = params_dataset$sensInf, max = 1, min = 0, step = 0.01
-              ),
-              numericInput(
-                'sensNInf',
-                'sensitivity of RT-PCR and Ag-RDT tests when testing non-contagious individuals',
-                value = params_dataset$sensNInf, max = 1, min = 0, step = 0.01
+              tabPanel(title = "Settings",
+                       fluidRow(
+                         box(
+                           width = 2,
+                           numericInput(
+                             'I',
+                             'Daily incidence for 100,000 persons',
+                             # FIX ME: add help (https://www.gouvernement.fr/info-coronavirus/carte-et-donnees)
+                             value = 185,
+                             min = 0,
+                             max = 100000
+                           ),
+                           numericInput(
+                             'R0',
+                             'Basic reproduction number',
+                             # FIX ME: add help  https://www.gouvernement.fr/info-coronavirus/carte-et-donnees
+                             value = 1.29,
+                             min = 0,
+                             step = 0.01
+                           )
+                         ),
+                         box(
+                           width = 5,
+                           column(
+                             6,
+                             sliderInput(
+                               'pLI',
+                               'Proportion of the population with low immunity (probability to have low immunity level at the admission)',
+                               value =  0.20,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'rinfLI',
+                               'Low immunity efficiency (probability to be infected compared to non immune)',
+                               value =  0.70,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'hNI2LI',
+                               'Daily probability to acquire low level of immunity when non immune',
+                               value =  1 / 30,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             numericInput(
+                               'tLI',
+                               'Average duration of low immunity (days)',
+                               value = 60,
+                               min = 1,
+                               step = 1
+                             )
+                           ),
+                           column(
+                             6,
+                             sliderInput(
+                               'pHI',
+                               'Proportion of the population with high immunity (probability to have high immunity level at the admission)',
+                               value =  0.50,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'rinfHI',
+                               'High immunity efficiency (probability to be infected compared to non immune)',
+                               value =  0.50,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'hLI2HI',
+                               'Daily probability to acquire high level of immunity when lowly immune',
+                               value =  1 / 60,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             numericInput(
+                               'tHI',
+                               'Average duration of high immunity (days)',
+                               value = 150,
+                               min = 1,
+                               step = 1
+                             ),
+                             style = 'border-left: 1px solid'
+                           )
+                         ),
+                         box(
+                           width = 5,
+                           column(
+                             6,
+                             h4("Probability to develop symptoms"),
+                             sliderInput(
+                               'psympNI',
+                               'With no history of infection or vaccination',
+                               value = 0.5,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'psympLI',
+                               'With old (>3 month) history of infection or vaccination',
+                               value = 0.2,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'psympHI',
+                               'With recent (<= 3 month) history of infection or vaccination',
+                               value = 0.2,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             )
+                           ),
+                           column(
+                             6,
+                             h4("Probability to develop severe symptoms when symptomatic (conditional probability)"),
+                             sliderInput(
+                               'psevNI',
+                               'With no history of infection or vaccination',
+                               value = 0.5,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'psevLI',
+                               'With old (>3 month) history of infection or vaccination',
+                               value = 0.3,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             sliderInput(
+                               'psevHI',
+                               'With recent (<= 3 month) history of infection or vaccination',
+                               value = 0.1,
+                               min = 0,
+                               max = 1,
+                               step = 0.01
+                             ),
+                             style = 'border-left: 1px solid'
+                           )
+                         )
+                       ),
+                       fluidRow(
+                         box(
+                           width = 12,
+                           column(
+                             2,
+                             numericInput(
+                               'tE',
+                               'Average duration of non contagious incubating period (days)',
+                               value = 5,
+                               min = 0,
+                               step = 0.5
+                             ),
+                             numericInput(
+                               'tEA',
+                               'Average duration of contagious incubating period for futur asymptomatic (days)',
+                               value = 2,
+                               min = 0,
+                               step = 0.5
+                             ),
+                             numericInput(
+                               'tIA',
+                               'Average duration of infectious period when asymptomatic (days)',
+                               value = 7,
+                               min = 0,
+                               step = 0.5
+                             )
+                           ),
+                           column(
+                             2,
+                             numericInput(
+                               'tES',
+                               'Average duration of contagious incubating period for futur symptomatic (days)',
+                               value = 2,
+                               min = 0,
+                               step = 0.5
+                             ),
+                             numericInput(
+                               'tIM',
+                               'Average duration of infectious period with mild symptoms (days)',
+                               value = 8,
+                               min = 0,
+                               step = 0.5
+                             ),
+                             numericInput(
+                               'tIS',
+                               'Average duration of infectious period with severe symptoms (days)',
+                               value = 9,
+                               min = 0,
+                               step = 0.5
+                             )
+                           ),
+                           column(
+                             8,
+                           plotOutput("disease_states")
+                           )
+                         )
+                       )),
+              tabPanel(
+                title = "References",
+                p(
+                  "This business game was part of a study at Aalborg University on human and AI business decision making.
+          Read more about the study at ",
+                  tags$a(
+                    href = "https://projekter.aau.dk/projekter/da/studentthesis/human-and-ai-decision-making-in-a-game-of-innovation-and-imitation(9121a1ed-d5d7-4cf0-b725-41f822533544).html",
+                    "https://projekter.aau.dk/projekter/da/studentthesis/human-and-ai-decision-making-in-a-game-of-innovation-and-imitation(9121a1ed-d5d7-4cf0-b725-41f822533544).html"
+                  )
+                ),
+                br(),
+                p(
+                  "Source code is available at ",
+                  tags$a(href = "https://github.com/psimm/businessgame", "https://github.com/psimm/businessgame")
+                ),
+                br(),
+                p("Contact: Paul Simmering (paul.simmering@gmail.com)"),
+                icon = icon("book"),
               )
-            ),
-          box(
-            title = "visitors",
-            solidHeader = T,
-            numericInput(
-              'gammaVin',
-              'daily number of visitors',
-              value = params_dataset$gammaVin, min = 0, step = 1
-            ),
-            numericInput(
-              'gammaVout',
-              'duration of stay of visitors in the ward',
-              value = params_dataset$gammaVout, min = 0, step = 1
             )
-          ),
-          selectizeInput("AL_test", "Is the clinical examination systematically followed by a test?",
-                           choices = c("No, only symptomatic by antigenic",
-                                       "No, only symptomatic by PCR",
-                                       "Yes, by antigenic",
-                                       "Yes, by PCR",
-                                       "Yes, in each ward, a pooled PCR-test is performed daily with samples from all new patients. In case of positive results, each admission is individually tested.",
-                                       "Yes, a pooled PCR-test is performed daily at the hospital scale with samples from all new patients. In case of positive results, each admission is individually tested.")
-
-            ),
-            numericInput(
-              'nHCWS_AL',
-              'Number of healthcare workers in contact with patients before test results',
-              value = 1,
-              min = 1,
-              step = 1
-            ),
-            numericInput(
-              'timeExCli',
-              'Duration of stay in the admission airlock for clinical examination in hours',
-              value = params_dataset$timeExCli, min = 0, step = 0.5
-            ),
-            numericInput(
-              'timeTest',
-              'Duration of stay in the admission  airlock for PCR testing in hours',
-              value = params_dataset$timeTest, min = 0, step = 0.5
-            ),
-            numericInput(
-              'betaPP_AL',
-              'From patient to patient in the airlock',
-              value = params_dataset$betaPP_AL, max = 1, min = 0, step = 0.01
-            ),
-            checkboxInput("allBetaAL", "Define all contact rates", value = FALSE, width = NULL),
-            conditionalPanel(condition = 'input.allBetaAL == 1',
-                             numericInput(
-                               'betaPH_AL',
-                               'From patient to healthcare worker in the airlock',
-                               value = params_dataset$betaPH_AL, max = 1, min = 0, step = 0.01
-                             ),
-                             numericInput(
-                               'betaHH_AL',
-                               'From healthcare worker to healthcare worker in the airlock',
-                               value = params_dataset$betaHH_AL, max = 1, min = 0, step = 0.01
-                             ),
-                             numericInput(
-                               'betaHP_AL',
-                               'From healthcare worker to patient in the airlock',
-                               value = params_dataset$betaHP_AL, max = 1, min = 0, step = 0.01
-                             ))
-          )
-  )
+          ))
 }
-

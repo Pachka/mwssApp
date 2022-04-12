@@ -26,7 +26,13 @@ tabItemStructure <- function(){
               solidHeader = T,
               h5("Note that HCWS are affiliated to the ward where they spend the most time."),
               br(),
-              div(DT::DTOutput("TS"), style = "font-size: 70%;")
+              h5("The work time of HCWS is not constrain to 100%.
+                 Some HCWS can have a part time (appearing in yellow) and other can to exceeding hours (appearing in red).
+                 Neverthess 1% of work time must correspond to the same duration for all HCWS."),
+              br(),
+              # div(DT::DTOutput("TS"), style = "font-size: 70%;"),
+              dataTableOutput('TS'),
+              editbuttonUI("editplanning", "Modify time distribution"),
             ),
             box(
               title = "Connectivity",

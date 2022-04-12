@@ -2,7 +2,7 @@ editWardbutton  <- function(input, output, session, wardchoices){
 
   observeEvent(input$editbut, {
     showModal(modalDialog(
-      title = "Here you can add new wards or buildings",
+      title = "Here you can edit ward or building structure",
       selectizeInput("wardtomod", "Ward/building name",
                      choices = wardchoices,
                      options = list(

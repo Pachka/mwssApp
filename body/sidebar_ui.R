@@ -62,7 +62,7 @@ sidebar <- dashboardSidebar(
     hidden(menuItem("hiddenSIM", tabName = "hiddenSIM")),
 
 
-    menuItem("About", icon = icon("sticky-note"), tabName = "ABOUT")
+    menuItem("About", icon = icon("sticky-note"), tabName = "ABOUT") # icon could also be "book
 
 
   )
