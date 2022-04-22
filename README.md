@@ -1,6 +1,11 @@
 # mwssApp
 Avant de l'utiliser assurez vous d'avoir installé le package mwss dont le fichier source est présent dans le répertoire (mwss_0.1.1.tar.gz).
-Une fois le répertoire synchronisé, vous devriez pouvoir lancer l'appli avec l'un des fichiers : app, global, ui ou server.
+Une fois le répertoire synchronisé, vous devriez pouvoir lancer l'appli avec l'un des fichiers : app, global, ui ou server. ou en utilisant le code suivant :
+``` 
+library(shiny)
+runGitHub("Pachka/mwssApp")
+```
+
 Vous trouverez la liste des packages nécessaires dans global.R
 
 
