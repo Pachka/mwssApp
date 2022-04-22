@@ -44,31 +44,31 @@ tabItemParams <- function() {
         p(
           "Parameters appearing here were define using litterature review and parameters estimation statistical approaches."
         ),
-        br(),
-        strong("Consumers"),
-        p(
-          "You earn money by creating products that consumers like. Consumers are the
-          blocks at the top row. The number on each block tells you how many consumers are in it. A consumer block's
-          position indicates its dream product. All consumers like products with a high technology level.
-          But there are also differences in taste, shown by their different positions on the preference fit axis."
-        ),
-        strong("Products"),
-        p(
-          "Filled circles represent products. Your first product (filled green circle) is already on the market. You can count the distance from a product to a consumer block. The closer a product, the more a consumer block
-          likes it. If a new product is closer to a consumer block than any previous product, the consumer block buys the product
-          and the product maker receives money equal to the number of consumers in the block."
-        ),
-        strong("Moves"),
-        p(
-          "New products can be developed by improving the technology of the product
-          that you already have, or by changing its marketing. You can also imitate your competitor's latest product.
-          Possible moves are indicated by empty circles. The number atop indicates the cost."
-        ),
-        strong("End of the game"),
-        p(
-          "The game ends when one producer makes a product that has the highest technology level (10). It
-          also ends if both producers decide they don't want to do anything one after another."
-        ),
+        # br(),
+        # strong("Consumers"),
+        # p(
+        #   "You earn money by creating products that consumers like. Consumers are the
+        #   blocks at the top row. The number on each block tells you how many consumers are in it. A consumer block's
+        #   position indicates its dream product. All consumers like products with a high technology level.
+        #   But there are also differences in taste, shown by their different positions on the preference fit axis."
+        # ),
+        # strong("Products"),
+        # p(
+        #   "Filled circles represent products. Your first product (filled green circle) is already on the market. You can count the distance from a product to a consumer block. The closer a product, the more a consumer block
+        #   likes it. If a new product is closer to a consumer block than any previous product, the consumer block buys the product
+        #   and the product maker receives money equal to the number of consumers in the block."
+        # ),
+        # strong("Moves"),
+        # p(
+        #   "New products can be developed by improving the technology of the product
+        #   that you already have, or by changing its marketing. You can also imitate your competitor's latest product.
+        #   Possible moves are indicated by empty circles. The number atop indicates the cost."
+        # ),
+        # strong("End of the game"),
+        # p(
+        #   "The game ends when one producer makes a product that has the highest technology level (10). It
+        #   also ends if both producers decide they don't want to do anything one after another."
+        # ),
         icon = icon("question-circle")
       ),
       tabPanel(
