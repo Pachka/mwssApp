@@ -9,6 +9,9 @@
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    sodipodi:docname="banner.svg"
+   inkscape:export-filename="D:\2- Boulot\2- Pasteur\Github\mwssApp - Copie\www\banner.png"
+   inkscape:export-xdpi="80"
+   inkscape:export-ydpi="80"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -24,12 +27,12 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.044194174"
-     inkscape:cx="6788.2251"
-     inkscape:cy="4152.131"
-     inkscape:window-width="1920"
-     inkscape:window-height="1001"
-     inkscape:window-x="-9"
+     inkscape:zoom="0.088388348"
+     inkscape:cx="8790.7515"
+     inkscape:cy="2460.7316"
+     inkscape:window-width="2400"
+     inkscape:window-height="1271"
+     inkscape:window-x="2391"
      inkscape:window-y="-9"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
@@ -376,20 +379,20 @@
       </g>
       <text
          xml:space="preserve"
-         transform="matrix(0.26458333,0,0,0.26458333,21.220232,629.90063)"
+         transform="matrix(0.26458333,0,0,0.26458333,100.86845,629.90063)"
          id="text47342-5"
          style="font-size:400px;line-height:453.543px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect47344-6);fill:#be012a;fill-opacity:1"
          x="0"
          y="0"><tspan
            x="2087.3789"
            y="2474.3384"
-           id="tspan965">Diffusion du Covid-19 dans les </tspan><tspan
+           id="tspan12743">Diffusion temporelle du Covid-19 </tspan><tspan
            x="2087.3789"
            y="2927.8814"
-           id="tspan967">établissements de soins de longue </tspan><tspan
+           id="tspan12745">dans les établissements de soins </tspan><tspan
            x="2087.3789"
            y="3381.4243"
-           id="tspan969">durée structurés en plusieurs services </tspan></text>
+           id="tspan12747">structurés en plusieurs services </tspan></text>
       <g
          id="g27684"
          transform="matrix(1.0078283,0,0,1.0078283,286.17528,132.79746)">
@@ -411,13 +414,13 @@
            y="0"><tspan
              x="2087.3789"
              y="2474.3384"
-             id="tspan971">Temporal spread of Covid-19 in </tspan><tspan
+             id="tspan12749">Temporal spread of Covid-19 in </tspan><tspan
              x="2087.3789"
              y="2927.8814"
-             id="tspan973">long-term care facilities structured </tspan><tspan
+             id="tspan12751">healthcare facilities structured in </tspan><tspan
              x="2087.3789"
              y="3381.4243"
-             id="tspan975">in multiple services</tspan></text>
+             id="tspan12753">multiple services</tspan></text>
       </g>
     </g>
     <g
@@ -429,7 +432,7 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:232px;line-height:87px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect6106);fill:#a69d8e;fill-opacity:1"><tspan
            x="-1857.9629"
            y="3698.9067"
-           id="tspan977">MWSS-App</tspan></text>
+           id="tspan12755">MWSS-App</tspan></text>
       <path
          style="fill:#c20029;fill-opacity:1;stroke:#c20029;stroke-width:10.2469;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:10.2469, 10.2469;stroke-dashoffset:0;stroke-opacity:1"
          d="m -658.70254,1232.9583 h 268.916"
