@@ -29,7 +29,7 @@ synthreport <- function(input, output, session, model, variable, n_days, n_sim, 
                        n_days = n_days(),
                        n_sim = n_sim(),
                        CSprotocols = CSprotocols())
-      save(params, file = "tmpdata/paramsReport.rda")
+      # save(params, file = "tmpdata/paramsReport.rda")
 
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document

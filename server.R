@@ -1284,18 +1284,18 @@ server <- function(input, output, session) {
 
     gdata = data$gdata
 
-    save(ward_names, file = "tmpdata/ward_names.Rda")
-    save(pop_size_P, file = "tmpdata/pop_size_P.Rda")
-    save(pop_size_H, file = "tmpdata/pop_size_H.Rda")
-    save(nVisits, file = "tmpdata/nVisits.Rda")
-    save(LS, file = "tmpdata/LS.Rda")
-    save(matContact, file = "tmpdata/matContact.Rda")
-    save(IMMstate, file = "tmpdata/IMMstate.Rda")
-    save(EPIstate,  file = "tmpdata/EPIstate.Rda")
-    save(SA,  file = "tmpdata/SA.Rda")
-    save(nH_SA,  file = "tmpdata/nH_SA.Rda")
-    save(gdata,  file = "tmpdata/gdata.Rda")
-    save(n_days,  file = "tmpdata/n_days.Rda")
+    # save(ward_names, file = "tmpdata/ward_names.Rda")
+    # save(pop_size_P, file = "tmpdata/pop_size_P.Rda")
+    # save(pop_size_H, file = "tmpdata/pop_size_H.Rda")
+    # save(nVisits, file = "tmpdata/nVisits.Rda")
+    # save(LS, file = "tmpdata/LS.Rda")
+    # save(matContact, file = "tmpdata/matContact.Rda")
+    # save(IMMstate, file = "tmpdata/IMMstate.Rda")
+    # save(EPIstate,  file = "tmpdata/EPIstate.Rda")
+    # save(SA,  file = "tmpdata/SA.Rda")
+    # save(nH_SA,  file = "tmpdata/nH_SA.Rda")
+    # save(gdata,  file = "tmpdata/gdata.Rda")
+    # save(n_days,  file = "tmpdata/n_days.Rda")
 
     mwssmodel <- mwss(
       ward_names,
