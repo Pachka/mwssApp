@@ -130,6 +130,10 @@ library(magrittr)
     # No regular screening
     gdata[c("ptestPWNI","ptestPWLI","ptestPWHI","ptestHNI","ptestHLI","ptestHHI")] <- 0
     
+    
+    nsim <- params$n_sim
+    nward <- length(ward_names)
+      
     mwssmodel <- mwss(
       ward_names,
       pop_size_P,
@@ -146,12 +150,12 @@ library(magrittr)
       verbose = FALSE
     )
     
-    baseline_traj <- multisim(mwssmodel, params$n_sim, ward_names)
+    baseline_traj <- multisim(mwssmodel, nsim, ward_names)
     
 ```
 
 ```{r, results='asis'}
-cat('This report present synthetic results of', params$control_traj %>% length,' simulations run for a', params$control_traj[[1]][,nodes%>% unique %>% length],"-wards healthcare facility. The wards are connected by the professionals. In this report, the simulations run with the baseline scenario: without any control nor surveillance measure (contact restriction, regular random screening, screening area at the admission, are compared to simulations run with:", 
+cat('This report present synthetic results of', nsim,' simulations run for a', nward, "-wards healthcare facility. The wards are connected by the professionals. In this report, the simulations run with the baseline scenario: without any control nor surveillance measure (contact restriction, regular random screening, screening area at the admission, are compared to simulations run with:", 
 params$CSprotocols %>% match(., c("ISO", "regscreen", "SA")) %>% c("confinement/contact restriction to detected patients", "implementation of random tests at regular intervals"," implementation of a screening area at patient admission including contact restriction/clinical examination/test")[.] %>% paste(., collapse = " / "),".")
 ```
 

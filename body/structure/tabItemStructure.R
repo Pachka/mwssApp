@@ -38,8 +38,55 @@ tabItemStructure <- function() {
               ),
               hr()
             ),
-            tabPanel(title = "How to use",
-                     icon = icon("question-circle")),
+            tabPanel(
+              title = "How to use",
+              icon = icon("question-circle"),
+              br(),
+              h3(
+                "Organizational structure of the healthcare facility and epidemiological impact."
+              ),
+              p(
+                "
+                Contact network, responsible for disease introduction and spread in healthcare facilities, implies
+                several subpopulations: medical staff, patients and visitors, potentially structured in subgroups such as:  departments, wards, and rooms.
+                In the frame of evaluating nosocomial transmission of Sars-CoV-2 in healthcare facilities,
+                MWSS considers direct transmission routes through effective contacts among thoses populations structured in wards.
+                Healthcare workers can be contaminated either at work: by infectious patients or infectious professionals, or in community.
+                Patients can be contaminated by infectious patients and professionals but also by infectious visitors."
+              ),
+              # https://doi.org/10.1016/j.jtbi.2008.07.001
+              h3("Inform mwss about your own healthcare system"),
+              HTML(
+                "
+                <br>
+                In the <b>'Structure'</b> tab, inform mwss about the structure of the system you want to represent.
+                <br>
+                In the <b>'General structure'</b> box, use buttons to add, edit or delete wards from your system.
+                For each ward, the system requires a unique name, a number of patients (beds/capacity), a number of professionals,
+                the average length of stay of patients (in days) and the average daily number of visitors.
+                When wards are added to the system, they appear in they 'Connectivity' network plot (the size of the node being
+                the total population size including both patients and professionals) and professionals are added to the
+                <b>'Health care workers shared time'</b> table assuming full time (100%) in the associated ward."
+              ),
+              h4("Professionals shared between multiple wards"),
+              HTML(
+                "The time spent by professionals into each ward can be adjusted using the 'Modify time distribution' button.
+                Total working time of a professional can be more or less than 100%,
+                nevertheless the `total` column will be highlighting those particular cases respectively in red and green to avoid mistack.
+                When professionals are spending time in multiple wards, it creates a connection between
+                those wards that will grahically appears on the connectivity network plot.
+                "
+              ),
+              h3("Save you structure"),
+              p(
+                "In the upper part of this panel you can use the green button: 'Download' to upload a structure,
+                     the associated buttons 'Browse' and 'Upload' to load a previously saved structure and the 'Clear' button to reset the tool.
+                     Please, note that uploading a dataset or clearing the structure will erase everything that has been previously recorded.
+                "
+              ),
+              h3("No copy of your entries is saved anywhere, neither on the cloud nor on our servers, remember to download it locally for
+                     later use.")
+            ),
             tabPanel(
               title = "Structure",
               icon = icon("sliders-h"),

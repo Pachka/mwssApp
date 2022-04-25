@@ -2,9 +2,8 @@ plotsoutputUI <- function(id) {
   ns <- NS(id)
 
   tagList(fluidRow(
-    box(
-      column(
-        2,
+    box( width = 6,
+         div(style = "display: inline-block;vertical-align:top;",
         numericInput(
           ns('outb_Thhold'),
           'Probability to have at least n nosocomial infection:',
@@ -13,10 +12,11 @@ plotsoutputUI <- function(id) {
           step = 1
         )
       ),
-      column(5,
-             plotOutput(ns("pOutbreak"))),
-      column(5,
-             plotOutput(ns("nosoHazard")))
+      div(style = "display: inline-block;vertical-align:top;",
+             plotOutput(ns("pOutbreak")))
+    ),
+    box(width = 6,
+        plotOutput(ns("nosoHazard"))
     ),
     box(
       column(

@@ -270,7 +270,7 @@ tabItemSim <- function() {
                   numericInput(
                     'n_sim',
                     'Number of simulations',
-                    value = 10,
+                    value = 50,
                     min = 1,
                     step = 1
                   ),
