@@ -32,12 +32,18 @@ wardAddPanel <- function(input, output, session) {
             min = 1,
             step = 1
           ),
+          tags$p(
+            "Note: Minimal length of stay is 1 day."
+          ),
           numericInput(
             'nVisits',
-            'Average number of visits per day',
+            'Average number of visitors per day',
             value = 0,
             min = 0,
             step = 1
+          ),
+          tags$p(
+            "Note: The daily number of visitors will be divided by the number of patients to obtain an average number of visit per day per patients."
           )
         ),
         uiOutput("addBut"),
