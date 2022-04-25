@@ -423,8 +423,8 @@ server <- function(input, output, session) {
       data$ward_names %<>% .[-selectedW]
       data$pop_size_P %<>% .[-selectedW]
       data$pop_size_H %<>% .[-selectedW]
-      data$LS[selectedW] %<>% .[-selectedW]
-      data$nVisits[selectedW] %<>% .[-selectedW]
+      data$LS %<>% .[-selectedW]
+      data$nVisits %<>% .[-selectedW]
 
       #####
       ##### Update professionals planning
@@ -1265,6 +1265,7 @@ server <- function(input, output, session) {
     pop_size_H <- data$pop_size_H
     nVisits <- data$nVisits
     LS <- data$LS
+    LS[LS == 0] <- 1
 
     # Screening area
     if ('SA' %in% input$CSprotocols) {
