@@ -40,36 +40,79 @@ tabItemParams <- function() {
       ),
       tabPanel(
         title = "How to use",
-        strong("Introduction"),
-        p(
-          "Parameters appearing here were define using litterature review and parameters estimation statistical approaches."
+        icon = icon("question-circle"),
+        h3("Epidemiological parameters"),
+        HTML(
+          "In this panel, you can adjust the epidemiological parameters.
+          Those parameters will drive the spread and introduction of the pathogen in the healthcare system structured in connected subpopulations.
+          "
         ),
-        # br(),
-        # strong("Consumers"),
-        # p(
-        #   "You earn money by creating products that consumers like. Consumers are the
-        #   blocks at the top row. The number on each block tells you how many consumers are in it. A consumer block's
-        #   position indicates its dream product. All consumers like products with a high technology level.
-        #   But there are also differences in taste, shown by their different positions on the preference fit axis."
-        # ),
-        # strong("Products"),
-        # p(
-        #   "Filled circles represent products. Your first product (filled green circle) is already on the market. You can count the distance from a product to a consumer block. The closer a product, the more a consumer block
-        #   likes it. If a new product is closer to a consumer block than any previous product, the consumer block buys the product
-        #   and the product maker receives money equal to the number of consumers in the block."
-        # ),
-        # strong("Moves"),
-        # p(
-        #   "New products can be developed by improving the technology of the product
-        #   that you already have, or by changing its marketing. You can also imitate your competitor's latest product.
-        #   Possible moves are indicated by empty circles. The number atop indicates the cost."
-        # ),
-        # strong("End of the game"),
-        # p(
-        #   "The game ends when one producer makes a product that has the highest technology level (10). It
-        #   also ends if both producers decide they don't want to do anything one after another."
-        # ),
-        icon = icon("question-circle")
+        h3("Upload a baseline set of parameters"),
+        HTML(
+          "In the upper part of this panel, you can use either the scrolling list, to select a SARS-CoV-2 variants,
+          or sequentially both buttons 'Browse' and 'Upload' to load a previously saved set of parameters.
+          Parameters loaded using the scrolling list were defined using literature review (see Reference tab) and
+          parameters estimation statistical approaches.
+          <br>
+          Be carreful, upload new parameters will erase any modified parameters. Think about regularly saving your inputs using the 'Download' button."
+        ),
+        h3("Adjust parameters"),
+        h4("Epidemiological parameters"),
+        HTML(
+          "In this tab, use the left part to inform mwss about the specificities in your facility related to professionals (<b>sick leave</b>)
+          and patients (<b>intensive care and potential comorbidities or resistance</b>).
+          For example, children are a lot less likely to develop severe symptoms, and inversely older are more likely to develop severe symptoms.
+          Use the right part to characterize contacts between populations (quantity, duration and level of infection control).
+          For example, infection control of children during visits could be lower than with professionals."
+        ),
+        h4("Test-related parameters"),
+        HTML(
+        "In this tab, use the left part to inform mwss about the used test (specificity, sensibility, duration and and targeted population).
+        Two type of tests are proposed:
+        <ol>
+        <li>antigen detection rapid diagnostic test (Ag-RDT), and</li>
+        <li>real-time reverse transcription polymerase chain reaction assay (RT-PCR).</li>
+        </ol>
+        In essence, both type of test being define by their specificity, sensibility and duration, it can be any type test,
+        nevertheless, in its stage of developpement, mwss only provides the possibility of discriminating two types of tests
+        used either for patient or professional screening, or for symptomatic patients confirmation.
+        <br>
+        Use the right side of the tab to inform on the detection/reaction time in case of symptoms for both patients and professionals.
+        "
+        ),
+        h4("Immunity-related parameters"),
+        HTML(
+          "
+          MWSS considers three immunity levels:
+        <ol>
+        <li> individuals without any immunity (neither vaccinated nor recovered), </li>
+        <li> individuals with a low immunity level (considering either an old vaccin injection or recovery), and </li>
+        <li> individuals with a high immunity level (considering either a recent vaccin injection or recovery). </li>
+        </ol>
+        <br>
+        Those three levels of immunity impact the probabilities of contacting the disease, and developping both mild and severe symptoms.
+        <br>
+          By default, all patients and professionals are considered as fully susceptible (neither vaccinated nor recovered).
+          In this tab, you can specify the initial immunity state of your population.
+          Your population will be randomly sampled based on probability weights define for each immunity level.
+          You can choose to use national proportion as probabilities, or set you own probability.
+          You can also choose to use different probabilities for different wards (for example,
+          you may face different immunity populations in a pediatric ward and in a psychiatric ward).
+          "
+        ),
+        h4("Expert corner"),
+        HTML(
+          "
+          This tab is mainly reserved to epidemiologists, nevertheless if you want to take your chance here, you have access to all the model parameters.
+          <br>
+          Using this tab, you can change the daily incidence, the basic reproduction number (R0) and the average disease duration.
+          Those paramaters will affect the probability of contamination of professionals in the community (outside of work), as well as
+          the probability to receive a infectious visitor.
+          You can also adjust the national proportions and duration of each immunity and epidemiological stages,
+          as well as the probability of receiving a vaccination dose.
+          Finally, you can adjust the immunity efficiency.
+          "
+        )
       ),
       tabPanel(
         title = "Epidemiological parameters",
@@ -144,7 +187,7 @@ tabItemParams <- function() {
               helper(
                 checkboxInput(
                   "comorbidities",
-                  "Do your patients have comorbidities?",
+                  "Do your patients have comorbidities or resistance?",
                   value = FALSE,
                   width = NULL
                 ),
@@ -435,7 +478,7 @@ tabItemParams <- function() {
               'input.ptestPWsymp > 0',
               numericInput(
                 'tbeftestPsymp',
-                'Average duration before test for symptomatic patients (hours)',
+                'Average duration between first symptoms and test for symptomatic patients (hours)',
                 value = 2,
                 min = 0.5,
                 step = 0.5
@@ -452,7 +495,7 @@ tabItemParams <- function() {
               'input.ptestHsymp > 0',
               numericInput(
                 'tbeftestHsymp',
-                'Average duration before test for symptomatic professionals (hours)',
+                'Average duration between first symptoms and test for symptomatic professionals (hours)',
                 value = 24,
                 min = 0.5,
                 step = 0.5
@@ -549,14 +592,22 @@ tabItemParams <- function() {
             width = 5,
             column(
               6,
-              sliderInput(
-                'pLI_NL',
-                'Proportion of the population with low immunity (probability to have low immunity level at the admission)',
-                value =  0.20,
-                min = 0,
-                max = 1,
-                step = 0.01
-              ),
+              helper(
+                sliderInput(
+                  'pLI_NL',
+                  'Proportion of the population with low immunity (probability to have low immunity level at the admission)',
+                  value =  0.20,
+                  min = 0,
+                  max = 1,
+                  step = 0.01
+                ),
+                icon = "exclamation-triangle",
+                colour = "orange",
+                type = "inline",
+                content = paste(
+                  "This proportion defines the national levels of immunity of the 'Immunity-related parameters' panel"
+                )
+                ),
               sliderInput(
                 'rinfLI',
                 'Low immunity efficiency (probability to be infected compared to non immune)',
@@ -583,14 +634,21 @@ tabItemParams <- function() {
             ),
             column(
               6,
-              sliderInput(
-                'pHI_NL',
-                'Proportion of the population with high immunity (probability to have high immunity level at the admission)',
-                value =  0.50,
-                min = 0,
-                max = 1,
-                step = 0.01
-              ),
+              helper(
+                sliderInput(
+                  'pHI_NL',
+                  'Proportion of the population with low immunity (probability to have low immunity level at the admission)',
+                  value =  0.50,
+                  min = 0,
+                  max = 1,
+                  step = 0.01
+                ),
+                icon = "exclamation-triangle",
+                colour = "orange",
+                type = "inline",
+                content = paste(
+                  "This proportion defines the national levels of immunity of the 'Immunity-related parameters' panel"
+                )),
               sliderInput(
                 'rinfHI',
                 'High immunity efficiency (probability to be infected compared to non immune)',

@@ -41,7 +41,6 @@ tabItemStructure <- function() {
             tabPanel(
               title = "How to use",
               icon = icon("question-circle"),
-              br(),
               h3(
                 "Organizational structure of the healthcare facility and epidemiological impact."
               ),
@@ -58,6 +57,8 @@ tabItemStructure <- function() {
               h3("Inform mwss about your own healthcare system"),
               HTML(
                 "
+                In this panel, you can inform the social network structure of your system.
+                That structure will shape the spread and introduction of the pathogen.
                 <br>
                 In the <b>'Structure'</b> tab, inform mwss about the structure of the system you want to represent.
                 <br>
@@ -79,9 +80,9 @@ tabItemStructure <- function() {
               ),
               h3("Save you structure"),
               p(
-                "In the upper part of this panel you can use the green button: 'Download' to upload a structure,
-                     the associated buttons 'Browse' and 'Upload' to load a previously saved structure and the 'Clear' button to reset the tool.
-                     Please, note that uploading a dataset or clearing the structure will erase everything that has been previously recorded.
+                "In the upper part of this panel, you can use the green button: 'Download' to upload a structure,
+                 the associated buttons 'Browse' and 'Upload' to load a previously saved structure and the 'Clear' button to reset the tool.
+                 Please, note that uploading a dataset or clearing the structure will erase everything that has been previously recorded.
                 "
               ),
               h3("No copy of your entries is saved anywhere, neither on the cloud nor on our servers, remember to download it locally for
