@@ -2,21 +2,49 @@ plotsoutputUI <- function(id) {
   ns <- NS(id)
 
   tagList(fluidRow(
-    box( width = 6,
-         div(style = "display: inline-block;vertical-align:top;",
-        numericInput(
-          ns('outb_Thhold'),
-          'Probability to have at least n nosocomial infection:',
-          value = 1,
-          min = 0,
-          step = 1
+    box(width = 6,
+        column(
+          4,
+          # div(style = "display: inline-block;vertical-align:top;",
+          numericInput(
+            ns('outb_Thhold'),
+            'Probability to have at least n nosocomial infection:',
+            value = 1,
+            min = 0,
+            step = 1
+          )
+        ),
+        column(8,
+               # div(style = "display: inline-block;vertical-align:top;",
+               plotOutput(ns(
+                 "pOutbreak"
+               )))),
+    box(
+      width = 6,
+      column(
+        4,
+        # div(style = "display: inline-block;vertical-align:top;",
+        checkboxInput(
+          ns("nosolegcol"),
+          "Limit the number of colors in the legend",
+          value = FALSE
+        ),
+        conditionalPanel(
+          condition =
+            paste0('input[\'', ns('nosolegcol'), "\'] == 1"),
+          sliderInput(
+            ns('nlegcol'),
+            'Number of colors in the legend:',
+            value = 5,
+            min = 2,
+            max = 10,
+            step = 1
+          )
         )
       ),
-      div(style = "display: inline-block;vertical-align:top;",
-             plotOutput(ns("pOutbreak")))
-    ),
-    box(width = 6,
-        plotOutput(ns("nosoHazard"))
+      column(8,
+             # div(style = "display: inline-block;vertical-align:top;",
+             plotOutput(ns("nosoHazard")))
     ),
     box(
       column(
@@ -51,14 +79,16 @@ plotsoutputUI <- function(id) {
           ),
           selected = FALSE
         ),
-        conditionalPanel(condition =
-                           paste0('input[\'', ns('iterInc'), "\'] == 0"),
-        checkboxInput(
-          inputId = ns("display_sdInc"),
-          label = "Display standard deviation",
-          value = FALSE,
-          width = NULL
-        )),
+        conditionalPanel(
+          condition =
+            paste0('input[\'', ns('iterInc'), "\'] == 0"),
+          checkboxInput(
+            inputId = ns("display_sdInc"),
+            label = "Display standard deviation",
+            value = FALSE,
+            width = NULL
+          )
+        ),
         checkboxInput(
           inputId = ns("iterInc"),
           label = "Display incidence for only one simulation",
@@ -137,158 +167,174 @@ plotsoutputUI <- function(id) {
   ))
 }
 
-plotsoutput <- function(input, output, session, model, variable, ndays) {
-  # model()
-  ns <- session$ns
+plotsoutput <-
+  function(input,
+           output,
+           session,
+           model,
+           variable,
+           ndays) {
+    # model()
+    ns <- session$ns
 
-  #########
-  ######### Network plot
-  #########
+    #########
+    ######### Network plot
+    #########
 
-  output$pOutbreak <- renderPlot({
-    plot_pOutbreak(
-      model(),
-      variable$matContact,
-      variable$pop_size_P,
-      outb_Thhold = input$outb_Thhold,
-      addtitle = TRUE,
-      verbose = FALSE
-    )
-  })
+    output$pOutbreak <- renderPlot({
+      plot_pOutbreak(
+        model(),
+        variable$matContact,
+        variable$pop_size_P,
+        outb_Thhold = input$outb_Thhold,
+        addtitle = TRUE,
+        verbose = FALSE
+      )
+    })
 
-  output$nosoHazard <- renderPlot({
+    output$nosoHazard <- renderPlot({
 
-    plot_nosoHazard(trajmwss = model(),
-                    ward_names = variable$ward_names,
-                    pop_size_P = variable$pop_size_P,
-                    LS = variable$LS,
-                    matContact = variable$matContact,
-                    addtitle = TRUE,
-                    verbose = FALSE)
+      if (input$nosolegcol == 1)
+        maxcolors <- input$nlegcol
+      else
+        maxcolors <- FALSE
 
-  })
+      plot_nosoHazard(
+        trajmwss = model(),
+        ward_names = variable$ward_names,
+        pop_size_P = variable$pop_size_P,
+        LS = variable$LS,
+        matContact = variable$matContact,
+        maxcolors = maxcolors,
+        addtitle = TRUE,
+        verbose = FALSE
+      )
+
+    })
 
 
-  #########
-  ######### Cummulative incidences
-  #########
+    #########
+    ######### Cumulative incidences
+    #########
 
-  output$iter_choiceInc <- renderUI({
-    selectInput(
-      inputId = ns("iter_inc"),
-      label = "Select a simulation",
-      choices = seq(length(model()))
-    )
-  })
+    output$iter_choiceInc <- renderUI({
+      selectInput(
+        inputId = ns("iter_inc"),
+        label = "Select a simulation",
+        choices = seq(length(model()))
+      )
+    })
 
-  output$ward_choiceInc <- renderUI({
-    selectInput(
-      inputId = ns("ward_inc"),
-      label = "Select a ward",
-      choices = variable$ward_names
-    )
-  })
+    output$ward_choiceInc <- renderUI({
+      selectInput(
+        inputId = ns("ward_inc"),
+        label = "Select a ward",
+        choices = variable$ward_names
+      )
+    })
 
-  output$plotIncidence <- renderPlot({
+    output$plotIncidence <- renderPlot({
+      ward = FALSE
 
-    ward = FALSE
-
-    if(isTRUE(input$iterInc) |  length(input$display_sdInc) == 0)
-      display_sdInc <- FALSE else
+      if (isTRUE(input$iterInc) |  length(input$display_sdInc) == 0)
+        display_sdInc <- FALSE
+      else
         display_sdInc <- input$display_sdInc
 
-    if (input$scaleInc == 1 & isTRUE(input$wardInc) & length(input$ward_inc) > 0)
-      ward = input$ward_inc
+      if (input$scaleInc == 1 &
+          isTRUE(input$wardInc) & length(input$ward_inc) > 0)
+        ward = input$ward_inc
 
-    if (input$iterInc == 1 & length(input$iter_inc) > 0)
-      iter = input$iter_inc %>% as.numeric
-    else
-      iter = FALSE
+      if (input$iterInc == 1 & length(input$iter_inc) > 0)
+        iter = input$iter_inc %>% as.numeric
+      else
+        iter = FALSE
 
-    if (input$popInc == "P+H" | length(input$popInc) == 0)
-      pop = FALSE
-    else
-      pop = input$popInc
+      if (input$popInc == "P+H" | length(input$popInc) == 0)
+        pop = FALSE
+      else
+        pop = input$popInc
 
       scale = input$scaleInc
       display_sd = display_sdInc
 
-    plot_incidence(
-      model(),
-      scale = scale,
-      pop = pop,
-      iter = iter,
-      ward = ward,
-      display_sd = display_sdInc
-    )
-  })
+      plot_incidence(
+        model(),
+        scale = scale,
+        pop = pop,
+        iter = iter,
+        ward = ward,
+        display_sd = display_sdInc
+      )
+    })
 
-  #########
-  ######### Daily test boxplot
-  #########
+    #########
+    ######### Daily test boxplot
+    #########
 
-  output$iter_choiceTest <- renderUI({
-    selectInput(
-      inputId = ns("iter_test"),
-      label = "Select a simulation",
-      choices = seq(length(model()))
-    )
-  })
+    output$iter_choiceTest <- renderUI({
+      selectInput(
+        inputId = ns("iter_test"),
+        label = "Select a simulation",
+        choices = seq(length(model()))
+      )
+    })
 
-  output$ward_choiceTest <- renderUI({
-    selectInput(
-      inputId = ns("ward_test"),
-      label = "Select a ward",
-      choices = variable$ward_names
-    )
-  })
+    output$ward_choiceTest <- renderUI({
+      selectInput(
+        inputId = ns("ward_test"),
+        label = "Select a ward",
+        choices = variable$ward_names
+      )
+    })
 
-  output$daysint_choiceTest <- renderUI({
-    numericInput(
-      ns('daysint'),
-      'Calculate median of daily number of test over n-days periods',
-      value = 1,
-      min = 0,
-      max = ndays(),
-      step = 1
-    )
-  })
-
-
-  output$plottest <- renderPlot({
-    ward = FALSE
-
-    if (input$scaleTest == 1 & isTRUE(input$wardTest) & length(input$ward_test) > 0)
-      ward = input$ward_test
+    output$daysint_choiceTest <- renderUI({
+      numericInput(
+        ns('daysint'),
+        'Calculate median of daily number of test over n-days periods',
+        value = 1,
+        min = 0,
+        max = ndays(),
+        step = 1
+      )
+    })
 
 
-    if (input$iterTest == 1 & length(input$iter_test) > 0)
-      iter = input$iter_test %>% as.numeric
-    else
-      iter = FALSE
+    output$plottest <- renderPlot({
+      ward = FALSE
 
-    if (input$popTest == "P+H")
-      pop = NULL
-    else
-      pop = input$popTest
+      if (input$scaleTest == 1 &
+          isTRUE(input$wardTest) & length(input$ward_test) > 0)
+        ward = input$ward_test
 
 
-    if (input$agrtest == 0 | length(input$daysint) == 0)
-      daysint = 1
-    else
-      daysint = input$daysint
+      if (input$iterTest == 1 & length(input$iter_test) > 0)
+        iter = input$iter_test %>% as.numeric
+      else
+        iter = FALSE
 
-    scale = input$scaleTest %>% as.numeric
+      if (input$popTest == "P+H")
+        pop = NULL
+      else
+        pop = input$popTest
 
-    plot_test(
-      model(),
-      daysint = daysint,
-      iter = iter,
-      ward = ward,
-      pop = pop,
-      scale = scale
-    )
 
-  })
+      if (input$agrtest == 0 | length(input$daysint) == 0)
+        daysint = 1
+      else
+        daysint = input$daysint
 
-}
+      scale = input$scaleTest %>% as.numeric
+
+      plot_test(
+        model(),
+        daysint = daysint,
+        iter = iter,
+        ward = ward,
+        pop = pop,
+        scale = scale
+      )
+
+    })
+
+  }

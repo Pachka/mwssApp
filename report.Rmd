@@ -164,9 +164,9 @@ params$CSprotocols %>% match(., c("ISO", "regscreen", "SA")) %>% c("confinement/
 
 ```{r, results='asis'}
 cat('In the simulations, a median of',
-baseline_traj %>% summary(., scale = 0, focus = "infections") %>% .$H %>% .$quantiles_noso %>% .[["50%"]], 
+baseline_traj %>% keyoutput(., scale = 0, focus = "infections") %>% .$H %>% .$quantiles_noso %>% .[["50%"]], 
 'nosocomial infections of professionals were observed in the baseline scenario, when a median of',
-params$control_traj %>% summary(., scale = 0, focus = "infections") %>% .$H %>% .$quantiles_noso %>% .[["50%"]], 
+params$control_traj %>% keyoutput(., scale = 0, focus = "infections") %>% .$H %>% .$quantiles_noso %>% .[["50%"]], 
 'nosocomial infections of professionals were observed with the tested surveillance and control measures.')
 ```
 

@@ -1,22 +1,13 @@
-library(shiny)
-library(dplyr)
-library(DT)
-library(ggplot2)
-library(statnet)
-library(igraph)
-library(network)
-library(shinydashboard)
-library(shinyjs)
-library(plotly)
-library(magrittr)
-library(mwss)
-library(SimInf)
-library(data.table)
-library(shinyWidgets)
-library(shinyhelper)
-library(shinyTime)
-library(shinyalert)
-library(knitr)
+# Load and if necessary install packages
+RequiredPackages <- c("shiny", "dplyr", "DT",
+                      "ggplot2", "statnet", "igraph",
+                      "network", "shinydashboard", "shinyjs",
+                      "plotly", "magrittr", "mwss",
+                      "SimInf", "data.table", "shinyWidgets",
+                      "shinyhelper", "shinyTime", "shinyalert", "knitr")
+for (i in RequiredPackages) { #Installs packages if not yet installed
+  if (!require(i, character.only = TRUE)) install.packages(i)
+}
 
 # Parameters dataset
 source('data/O1.R', local = TRUE)

@@ -928,17 +928,17 @@ server <- function(input, output, session) {
 
       })
 
-
       # default for all
       V(g)$pie.color = list(c("#FF1A1A", "#FFC61A", "#C6FF1A"))
 
       plot(
         g,
+        layout = layout_nicely(g),
         vertex.shape = "pie",
         vertex.pie = values,
-        vertex.size = 30,
+        vertex.size = input$piesize,
         vertex.label = data$ward_names,
-        vertex.label.dist = 3,
+        vertex.label.dist = input$labelpos,
         vertex.label.degree = pi / 2
       )
     }
@@ -1028,33 +1028,24 @@ server <- function(input, output, session) {
 
     # Screening area
 
-    if('regscreen' %in% input$CSprotocols){
-      if ('screenstrP' %in% input$regscreenPop) {
         ptestPWNI = input$ptestPWNI # probability to test NI patients in the ward
         ptestPWLI = input$ptestPWLI # probability to test PI patients in the ward
         ptestPWHI = input$ptestPWHI # probability to test FI patients in the ward
-      } else {
-        ptestPWNI = 0 # probability to test NI patients in the ward
-        ptestPWLI = 0 # probability to test PI patients in the ward
-        ptestPWHI = 0 # probability to test FI patients in the ward
-      }
-
-      if ('screenstrH' %in% input$regscreenPop) {
         ptestHNI = input$ptestHNI # probability to test NI HCWS
         ptestHLI = input$ptestHLI # probability to test PI HCWS
         ptestHHI = input$ptestHHI # probability to test FI HCWS
-      } else {
-        ptestHNI = 0 # probability to test NI HCWS
-        ptestHLI = 0 # probability to test PI HCWS
-        ptestHHI = 0 # probability to test FI HCWS
-      }} else {
-        ptestPWNI = 0 # probability to test NI patients in the ward
-        ptestPWLI = 0 # probability to test PI patients in the ward
-        ptestPWHI = 0 # probability to test FI patients in the ward
-        ptestHNI = 0 # probability to test NI HCWS
-        ptestHLI = 0 # probability to test PI HCWS
-        ptestHHI = 0 # probability to test FI HCWS
-      }
+
+        if (!('screenstrP' %in% input$regscreenPop)) {
+          ptestPWNI = 0 # probability to test NI patients in the ward
+          ptestPWLI = 0 # probability to test PI patients in the ward
+          ptestPWHI = 0 # probability to test FI patients in the ward
+        }
+
+        if (!('screenstrH' %in% input$regscreenPop)) {
+          ptestHNI = 0 # probability to test NI HCWS
+          ptestHLI = 0 # probability to test PI HCWS
+          ptestHHI = 0 # probability to test FI HCWS
+        }
 
 
     pISO <- ifelse('ISO' %in% input$CSprotocols,

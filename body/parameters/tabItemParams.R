@@ -536,10 +536,12 @@ tabItemParams <- function() {
               title = "Visualize the immunity levels of each ward and remove entries",
               width = 12,
               solidHeader = T,
-              div(style = "display: inline-block;vertical-align:top;",
+              column(5,
+              # div(style = "display: inline-block;vertical-align:top;",
                   div(DT::DTOutput("IMMstateTab"), style = "font-size: 70%;")),
-              div(
-                style = "display: inline-block;vertical-align:top;",
+              column(7,
+              # div(
+              #   style = "display: inline-block;vertical-align:top;",
                 selectInput(
                   "popimm_plot",
                   label = "Display initial immunity state for (population):",
@@ -549,6 +551,15 @@ tabItemParams <- function() {
                     "Professionals" = "H"
                   )
                 ),
+              sliderInput("piesize",
+                          "Size of the pies",
+                          min=5, max = 50, value = 30),
+              sliderInput("labelpos",
+                          "Position of the ward names",
+                          min=0, max = 10, value = 3),
+              # sliderInput("alphalabelpos",
+              #             "Position of the ward names (angle)",
+              #             min = 1, max = 10, value = 2),
                 plotOutput("imm_plot")),
               # div(
               #   style = "display: inline-block;vertical-align:top;"
@@ -742,22 +753,7 @@ tabItemParams <- function() {
       ),
       tabPanel(
         title = "References",
-        p(
-          "This business game was part of a study at Aalborg University on human and AI business decision making.
-          Read more about the study at ",
-          tags$a(
-            href = "https://projekter.aau.dk/projekter/da/studentthesis/human-and-ai-decision-making-in-a-game-of-innovation-and-imitation(9121a1ed-d5d7-4cf0-b725-41f822533544).html",
-            "https://projekter.aau.dk/projekter/da/studentthesis/human-and-ai-decision-making-in-a-game-of-innovation-and-imitation(9121a1ed-d5d7-4cf0-b725-41f822533544).html"
-          )
-        ),
-        br(),
-        p(
-          "Source code is available at ",
-          tags$a(href = "https://github.com/psimm/businessgame", "https://github.com/psimm/businessgame")
-        ),
-        br(),
-        p("Contact: Paul Simmering (paul.simmering@gmail.com)"),
-        icon = icon("book"),
+        icon = icon("book")
       )
     )
   )
