@@ -183,9 +183,9 @@ plotsoutput <-
 
     output$pOutbreak <- renderPlot({
       plot_pOutbreak(
-        model(),
-        variable$matContact,
-        variable$pop_size_P,
+        trajmwss = model(),
+        pop_size_P = variable$pop_size_P,
+        matContact = variable$matContact,
         outb_Thhold = input$outb_Thhold,
         addtitle = TRUE,
         verbose = FALSE
@@ -259,7 +259,7 @@ plotsoutput <-
       display_sd = display_sdInc
 
       plot_incidence(
-        model(),
+        trajmwss = model(),
         scale = scale,
         pop = pop,
         iter = iter,
@@ -326,13 +326,13 @@ plotsoutput <-
 
       scale = input$scaleTest %>% as.numeric
 
-      plot_test(
-        model(),
-        daysint = daysint,
+      plot_testcount(
+        trajmwss = model(),
+        scale = scale,
+        pop = pop,
         iter = iter,
         ward = ward,
-        pop = pop,
-        scale = scale
+        daysint = daysint
       )
 
     })

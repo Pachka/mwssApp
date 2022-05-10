@@ -184,6 +184,15 @@ tabItemParams <- function() {
                   step = 0.5
                 )
               ),
+              sliderInput(
+                "pdieIC",
+                label = 'Probability of dying in intensive care',
+                min = 0,
+                max = 100,
+                value = 0.5,
+                step = 0.1,
+                post = " %"
+              ),
               helper(
                 checkboxInput(
                   "comorbidities",
@@ -231,15 +240,6 @@ tabItemParams <- function() {
                   content = paste(
                     "For the professionals, the percent probabilities are currently set at ... % for non immune, ... % for individuals with old vaccination or infection history and ... % for those with recent vaccination or infection history."
                   ) # FIX ME give an example
-                ),
-                sliderInput(
-                  "pdieIC",
-                  label = 'Probability of dying in intensive care',
-                  min = 0,
-                  max = 100,
-                  value = 0.5,
-                  step = 0.1,
-                  post = " %"
                 )
               )
             )
