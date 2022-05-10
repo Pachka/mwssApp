@@ -2,23 +2,83 @@ plotsoutputUI <- function(id) {
   ns <- NS(id)
 
   tagList(fluidRow(
-    box(width = 6,
-        column(
-          4,
-          # div(style = "display: inline-block;vertical-align:top;",
-          numericInput(
-            ns('outb_Thhold'),
-            'Probability to have at least n nosocomial infection:',
-            value = 1,
-            min = 0,
+    box(
+      width = 6,
+      column(
+        4,
+        # div(style = "display: inline-block;vertical-align:top;",
+        numericInput(
+          ns('outb_Thhold'),
+          'Probability to have at least n nosocomial infection:',
+          value = 1,
+          min = 0,
+          step = 1
+        ),
+        checkboxInput(
+          ns("pOBlegcol"),
+          "Limit the number of colors in the legend",
+          value = FALSE
+        ),
+        conditionalPanel(
+          condition =
+            paste0('input[\'', ns('pOBlegcol'), "\'] == 1"),
+          sliderInput(
+            ns('nlegcolpOB'),
+            'Number of colors in the legend:',
+            value = 5,
+            min = 2,
+            max = 10,
             step = 1
           )
         ),
-        column(8,
-               # div(style = "display: inline-block;vertical-align:top;",
-               plotOutput(ns(
-                 "pOutbreak"
-               )))),
+        hr(),
+        checkboxInput(
+          ns("pOBoptions"),
+          "Layout options",
+          value = FALSE
+        ),
+        conditionalPanel(
+          condition =
+            paste0('input[\'', ns('pOBoptions'), "\'] == 1"),
+          selectInput(ns('pOBlayout'), "Layout", c("as_star","as_tree","in_circle","nicely","on_grid","on_sphere",
+                                                   "randomly","with_dh","with_fr","with_gem","with_graphopt",
+                                                   "with_kk","with_lgl", "with_mds", "with_sugiyama")),
+          sliderInput(
+            ns('pOBvertexsize'),
+            'Size of the wards:',
+            value = 0.5,
+            min = 0.1,
+            max = 1,
+            step = 0.1
+          ),
+          sliderInput(
+            ns('pOBvertexlabelsize'),
+            'Size of the names:',
+            value = 0.03,
+            min = 0.01,
+            max = 0.1,
+            step = 0.01
+          ),
+          sliderInput(
+            ns('pOBedgearrowsize'),
+            'Size of the arrows:',
+            value = 0.4,
+            min = 0.1,
+            max = 1,
+            step = 0.1
+          )
+        ),
+        radioButtons(
+          inputId = ns("formatP1"),
+          label = "Select the file type",
+          choices = list("png", "pdf")
+        ),
+        downloadButton(outputId = ns("down_pOutbreak"), label = "Download the plot")
+      ),
+      column(8,
+             # div(style = "display: inline-block;vertical-align:top;",
+             plotOutput(ns("pOutbreak")))
+    ),
     box(
       width = 6,
       column(
@@ -33,14 +93,21 @@ plotsoutputUI <- function(id) {
           condition =
             paste0('input[\'', ns('nosolegcol'), "\'] == 1"),
           sliderInput(
-            ns('nlegcol'),
+            ns('nlegcolnosoHaza'),
             'Number of colors in the legend:',
             value = 5,
             min = 2,
             max = 10,
             step = 1
           )
-        )
+        ),
+        hr(),
+        radioButtons(
+          inputId = ns("formatP2"),
+          label = "Select the file type",
+          choices = list("png", "pdf")
+        ),
+        downloadButton(outputId = ns("down_nosoHazard"), label = "Download the plot")
       ),
       column(8,
              # div(style = "display: inline-block;vertical-align:top;",
@@ -97,7 +164,14 @@ plotsoutputUI <- function(id) {
         ),
         conditionalPanel(condition =
                            paste0('input[\'', ns('iterInc'), "\'] == 1"),
-                         uiOutput(ns("iter_choiceInc")))
+                         uiOutput(ns("iter_choiceInc"))),
+        hr(),
+        radioButtons(
+          inputId = ns("formatP3"),
+          label = "Select the file type",
+          choices = list("png", "pdf")
+        ),
+        downloadButton(outputId = ns("down_Incidence"), label = "Download the plot")
       ),
       column(8,
              plotOutput(ns("plotIncidence")))
@@ -140,7 +214,7 @@ plotsoutputUI <- function(id) {
         ),
         checkboxInput(
           inputId = ns("iterTest"),
-          label = "Display incidence for only one simulation",
+          label = "Display number of tests for only one simulation",
           value = FALSE,
           width = NULL
         ),
@@ -159,7 +233,14 @@ plotsoutputUI <- function(id) {
                            paste0('input[\'', ns('agrtest'), "\'] == 1"),
                          uiOutput(ns(
                            "daysint_choiceTest"
-                         )))
+                         ))),
+        hr(),
+        radioButtons(
+          inputId = ns("formatP4"),
+          label = "Select the file type",
+          choices = list("png", "pdf")
+        ),
+        downloadButton(outputId = ns("down_nTest"), label = "Download the plot")
       ),
       column(8,
              plotOutput(ns("plottest")))
@@ -181,21 +262,55 @@ plotsoutput <-
     ######### Network plot
     #########
 
-    output$pOutbreak <- renderPlot({
+    mypOutbreak <- function() {
+      if (input$pOBlegcol == 1)
+        maxcolors <- input$nlegcolpOB
+      else
+        maxcolors <- FALSE
+
       plot_pOutbreak(
         trajmwss = model(),
         pop_size_P = variable$pop_size_P,
         matContact = variable$matContact,
         outb_Thhold = input$outb_Thhold,
+        layout = input$pOBlayout,
+        vertexsize = input$pOBvertexsize,
+        vertexlabelsize =input$pOBvertexlabelsize,
+        edgearrowsize = input$pOBedgearrowsize,
+        maxcolors = maxcolors,
         addtitle = TRUE,
         verbose = FALSE
       )
+
+    }
+
+    output$pOutbreak <- renderPlot({
+      mypOutbreak()
     })
 
-    output$nosoHazard <- renderPlot({
+    # downloadHandler contains 2 arguments as functions, namely filename, content
+    output$down_pOutbreak <- downloadHandler(
+      filename =  function() {
+        paste("outbreak_probability", input$formatP1, sep = ".")
+      },
+      # content is a function with argument file. content writes the plot to the device
+      content = function(file) {
+        if (input$formatP1 == "png")
+          png(file, res = 150) # open the png device
+        else
+          pdf(file) # open the pdf device
 
+        mypOutbreak()
+
+        # draw the plot
+        dev.off()  # turn the device off
+      }
+    )
+
+    ## a plot function
+    mynosoHazard <- function() {
       if (input$nosolegcol == 1)
-        maxcolors <- input$nlegcol
+        maxcolors <- input$nlegcolnosoHaza
       else
         maxcolors <- FALSE
 
@@ -209,9 +324,32 @@ plotsoutput <-
         addtitle = TRUE,
         verbose = FALSE
       )
+    }
 
+
+    output$nosoHazard <- renderPlot({
+      mynosoHazard()
     })
 
+    # downloadHandler contains 2 arguments as functions, namely filename, content
+    output$down_nosoHazard <- downloadHandler(
+      filename =  function() {
+        paste("nosocomial_hazard", input$formatP2, sep = ".")
+      },
+      # content is a function with argument file. content writes the plot to the device
+      content = function(file) {
+        if (input$formatP2 == "png")
+          png(file) # open the png device
+        else
+          pdf(file) # open the pdf device
+
+        mynosoHazard()
+
+        # draw the plot
+        dev.off()  # turn the device off
+
+      }
+    )
 
     #########
     ######### Cumulative incidences
@@ -233,7 +371,9 @@ plotsoutput <-
       )
     })
 
-    output$plotIncidence <- renderPlot({
+
+    myIncidence <- function() {
+
       ward = FALSE
 
       if (isTRUE(input$iterInc) |  length(input$display_sdInc) == 0)
@@ -266,7 +406,30 @@ plotsoutput <-
         ward = ward,
         display_sd = display_sdInc
       )
+    }
+
+    output$plotIncidence <- renderPlot({
+      myIncidence()
     })
+
+    # downloadHandler contains 2 arguments as functions, namely filename, content
+    output$down_Incidence <- downloadHandler(
+      filename =  function() {
+        paste("daily_incidence", input$formatP3, sep = ".")
+      },
+      # content is a function with argument file. content writes the plot to the device
+      content = function(file) {
+        if (input$formatP3 == "png")
+          png(file) # open the png device
+        else
+          pdf(file) # open the pdf device
+
+        myIncidence()
+
+        # draw the plot
+        dev.off()  # turn the device off
+      }
+    )
 
     #########
     ######### Daily test boxplot
@@ -299,8 +462,7 @@ plotsoutput <-
       )
     })
 
-
-    output$plottest <- renderPlot({
+    myTestcounter <- function() {
       ward = FALSE
 
       if (input$scaleTest == 1 &
@@ -334,7 +496,29 @@ plotsoutput <-
         ward = ward,
         daysint = daysint
       )
+    }
 
+    output$plottest <- renderPlot({
+      myTestcounter()
     })
+
+    # downloadHandler contains 2 arguments as functions, namely filename, content
+    output$down_nTest <- downloadHandler(
+      filename =  function() {
+        paste("daily_test_counter", input$formatP4, sep = ".")
+      },
+      # content is a function with argument file. content writes the plot to the device
+      content = function(file) {
+        if (input$formatP4 == "png")
+          png(file) # open the png device
+        else
+          pdf(file) # open the pdf device
+
+        myTestcounter()
+
+        # draw the plot
+        dev.off()  # turn the device off
+      }
+    )
 
   }

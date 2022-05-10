@@ -307,7 +307,8 @@ tabItemSim <- function() {
                     div(
                       style = "display: inline-block;vertical-align:top;",
                       conditionalPanel("output.simoutput == true",
-                                       synthreportUI("report_exp"))
+                                       synthreportUI("report_exp"),
+                                       exporttrajUI("export_traj"))
                     )
                   )
                 )
