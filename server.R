@@ -1096,7 +1096,7 @@ server <- function(input, output, session) {
       #  basic reproduction number
       R0 = input$R0,
       # https://www.gouvernement.fr/info-coronavirus/carte-et-donnees
-      tw = 35,
+      tw = input$tw,
       tSA  = (as.numeric(strftime(input$tSA, "%M")) / 60 + as.numeric(strftime(input$tSA, "%H"))) /
         24,
       # average duration before full admission (in screening area for clinical exam, administrative procedure, etc)
