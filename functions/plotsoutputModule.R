@@ -3,10 +3,8 @@ plotsoutputUI <- function(id) {
 
   tagList(fluidRow(
     box(
-      width = 6,
       column(
         4,
-        # div(style = "display: inline-block;vertical-align:top;",
         numericInput(
           ns('outb_Thhold'),
           'Probability to have at least n nosocomial infection:',
@@ -57,7 +55,8 @@ plotsoutputUI <- function(id) {
               "with_lgl",
               "with_mds",
               "with_sugiyama"
-            )
+            ),
+            selected = "with_fr"
           ),
           sliderInput(
             ns('pOBvertexsize'),
@@ -95,7 +94,6 @@ plotsoutputUI <- function(id) {
              plotOutput(ns("pOutbreak")))
     ),
     box(
-      width = 6,
       column(
         4,
         checkboxInput(
@@ -123,9 +121,9 @@ plotsoutputUI <- function(id) {
           condition =
             paste0('input[\'', ns('nosoHazaoptions'), "\'] == 1"),
           selectInput(
-            ns('nosoHazalayout'),
-            "Layout",
-            c(
+            inputId = ns('nosoHazalayout'),
+            label = "Layout",
+            choices = c(
               "as_star",
               "as_tree",
               "in_circle",
@@ -141,7 +139,8 @@ plotsoutputUI <- function(id) {
               "with_lgl",
               "with_mds",
               "with_sugiyama"
-            )
+            ),
+            selected = "with_fr"
           ),
           sliderInput(
             ns('nosoHazavertexsize'),
@@ -242,7 +241,6 @@ plotsoutputUI <- function(id) {
       column(8,
              plotOutput(ns("plotIncidence")))
     ),
-    br(),
     box(
       column(
         4,
@@ -569,7 +567,6 @@ plotsoutput <-
     }
 
     output$plottest <- renderPlot({
-
       myTestcounter()
 
     })

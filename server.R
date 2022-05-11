@@ -1312,7 +1312,6 @@ server <- function(input, output, session) {
 
   })
 
-
   output$simoutput <- reactive({
     return(class(runmodel()) == "mwss")
   })
