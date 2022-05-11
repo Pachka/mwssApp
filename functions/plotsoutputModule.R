@@ -32,17 +32,33 @@ plotsoutputUI <- function(id) {
           )
         ),
         hr(),
-        checkboxInput(
-          ns("pOBoptions"),
-          "Layout options",
-          value = FALSE
-        ),
+        checkboxInput(ns("pOBoptions"),
+                      "Layout options",
+                      value = FALSE),
         conditionalPanel(
           condition =
             paste0('input[\'', ns('pOBoptions'), "\'] == 1"),
-          selectInput(ns('pOBlayout'), "Layout", c("as_star","as_tree","in_circle","nicely","on_grid","on_sphere",
-                                                   "randomly","with_dh","with_fr","with_gem","with_graphopt",
-                                                   "with_kk","with_lgl", "with_mds", "with_sugiyama")),
+          selectInput(
+            ns('pOBlayout'),
+            "Layout",
+            c(
+              "as_star",
+              "as_tree",
+              "in_circle",
+              "nicely",
+              "on_grid",
+              "on_sphere",
+              "randomly",
+              "with_dh",
+              "with_fr",
+              "with_gem",
+              "with_graphopt",
+              "with_kk",
+              "with_lgl",
+              "with_mds",
+              "with_sugiyama"
+            )
+          ),
           sliderInput(
             ns('pOBvertexsize'),
             'Size of the wards:',
@@ -76,14 +92,12 @@ plotsoutputUI <- function(id) {
         downloadButton(outputId = ns("down_pOutbreak"), label = "Download the plot")
       ),
       column(8,
-             # div(style = "display: inline-block;vertical-align:top;",
              plotOutput(ns("pOutbreak")))
     ),
     box(
       width = 6,
       column(
         4,
-        # div(style = "display: inline-block;vertical-align:top;",
         checkboxInput(
           ns("nosolegcol"),
           "Limit the number of colors in the legend",
@@ -102,6 +116,58 @@ plotsoutputUI <- function(id) {
           )
         ),
         hr(),
+        checkboxInput(ns("nosoHazaoptions"),
+                      "Layout options",
+                      value = FALSE),
+        conditionalPanel(
+          condition =
+            paste0('input[\'', ns('nosoHazaoptions'), "\'] == 1"),
+          selectInput(
+            ns('nosoHazalayout'),
+            "Layout",
+            c(
+              "as_star",
+              "as_tree",
+              "in_circle",
+              "nicely",
+              "on_grid",
+              "on_sphere",
+              "randomly",
+              "with_dh",
+              "with_fr",
+              "with_gem",
+              "with_graphopt",
+              "with_kk",
+              "with_lgl",
+              "with_mds",
+              "with_sugiyama"
+            )
+          ),
+          sliderInput(
+            ns('nosoHazavertexsize'),
+            'Size of the wards:',
+            value = 0.5,
+            min = 0.1,
+            max = 1,
+            step = 0.1
+          ),
+          sliderInput(
+            ns('nosoHazavertexlabelsize'),
+            'Size of the names:',
+            value = 0.03,
+            min = 0.01,
+            max = 0.1,
+            step = 0.01
+          ),
+          sliderInput(
+            ns('nosoHazaedgearrowsize'),
+            'Size of the arrows:',
+            value = 0.4,
+            min = 0.1,
+            max = 1,
+            step = 0.1
+          )
+        ),
         radioButtons(
           inputId = ns("formatP2"),
           label = "Select the file type",
@@ -275,7 +341,7 @@ plotsoutput <-
         outb_Thhold = input$outb_Thhold,
         layout = input$pOBlayout,
         vertexsize = input$pOBvertexsize,
-        vertexlabelsize =input$pOBvertexlabelsize,
+        vertexlabelsize = input$pOBvertexlabelsize,
         edgearrowsize = input$pOBedgearrowsize,
         maxcolors = maxcolors,
         addtitle = TRUE,
@@ -320,8 +386,12 @@ plotsoutput <-
         pop_size_P = variable$pop_size_P,
         LS = variable$LS,
         matContact = variable$matContact,
-        maxcolors = maxcolors,
+        layout = input$nosoHazalayout,
+        vertexsize = input$nosoHazavertexsize,
+        vertexlabelsize = input$nosoHazavertexlabelsize,
+        edgearrowsize = input$nosoHazaedgearrowsize,
         addtitle = TRUE,
+        maxcolors = maxcolors,
         verbose = FALSE
       )
     }
@@ -373,7 +443,6 @@ plotsoutput <-
 
 
     myIncidence <- function() {
-
       ward = FALSE
 
       if (isTRUE(input$iterInc) |  length(input$display_sdInc) == 0)

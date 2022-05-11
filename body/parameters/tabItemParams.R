@@ -123,9 +123,8 @@ tabItemParams <- function() {
             solidHeader = T,
             column(
               width = 6,
-              br(),
               h4("Health care workers"),
-              #
+              br(),
               sliderInput(
                 "pSL",
                 label = 'Probability that professionals developping mild symptoms takes sick leave',
@@ -161,6 +160,14 @@ tabItemParams <- function() {
                 max = 100,
                 value = 10,
                 post  = " %"
+              ),
+              numericInput(
+                'tw',
+                'Average number of working hours per professional per week (hours)',
+                value = 35,
+                min = 1,
+                max = 70,
+                step = 1
               )
             ),
             column(
