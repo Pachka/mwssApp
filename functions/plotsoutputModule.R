@@ -565,10 +565,13 @@ plotsoutput <-
         ward = ward,
         daysint = daysint
       )
+
     }
 
     output$plottest <- renderPlot({
+
       myTestcounter()
+
     })
 
     # downloadHandler contains 2 arguments as functions, namely filename, content

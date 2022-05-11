@@ -132,5 +132,7 @@ valueboxoutput <- function(input, output, session, model) {
       color = "green",
       width = NULL
     )
+
   })
+
 }

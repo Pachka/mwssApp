@@ -1321,11 +1321,9 @@ server <- function(input, output, session) {
                 'simoutput',
                 suspendWhenHidden = FALSE)
 
-
   callModule(module = valueboxoutput,
              id = "simulation",
              model = runmodel)
-
 
   callModule(module = plotsoutput,
              id = "simulationPlots",

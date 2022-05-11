@@ -301,15 +301,28 @@ tabItemSim <- function() {
                     actionButton(
                       "runmodel",
                       "Run",
+                      # span("Run", id = "UpdateAnimate", class = "loading dots"),
                       icon = icon("play"),
                       style = "color: #fff; background-color: #063567; border-color: #2e6da4"
                     ),
                     div(
                       style = "display: inline-block;vertical-align:top;",
-                      conditionalPanel("output.simoutput == true",
-                                       synthreportUI("report_exp"),
-                                       exporttrajUI("export_traj"))
+                      conditionalPanel(
+                        "output.simoutput == true",
+                        synthreportUI("report_exp"),
+                        exporttrajUI("export_traj")
+                      )
                     )
+                  ),
+                  # display load spinner when shiny is busy
+                  conditionalPanel(
+                    condition = "$(\'html\').hasClass(\'shiny-busy\')",
+                    tags$div(
+                      "Simulation in progress. This may take a while...",
+                      id = "loadmessage"
+                    ),
+                    tags$div(class = "loader"),
+                    tags$div(class = "prevent_click")
                   )
                 )
               ),

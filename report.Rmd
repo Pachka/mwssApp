@@ -146,7 +146,7 @@ library(magrittr)
       SA = SA,
       nH_SA = nH_SA,
       gdata = gdata,
-      tspan =  n_days,
+      tSim  = n_days,
       verbose = FALSE
     )
     
