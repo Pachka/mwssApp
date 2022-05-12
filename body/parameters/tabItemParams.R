@@ -54,27 +54,27 @@ tabItemParams <- function() {
           Parameters loaded using the scrolling list were defined using literature review (see Reference tab) and
           parameters estimation statistical approaches.
           <br>
-          Be carreful, upload new parameters will erase any modified parameters. Think about regularly saving your inputs using the 'Download' button."
+          Be careful, upload new parameters will erase any modified parameters. Think about regularly saving your inputs using the 'Download' button."
         ),
         h3("Adjust parameters"),
         h4("Epidemiological parameters"),
         HTML(
-          "In this tab, use the left part to inform mwss about the specificities in your facility related to professionals (<b>sick leave</b>)
-          and patients (<b>intensive care and potential comorbidities or resistance</b>).
+          "In this tab, use the left part to inform mwss about the specificities in your facility related to professionals (<b>sick leave</b>: SL and <b>extended sick leave</b>: ESL)
+          and patients (<b>intensive care</b>: IC and <b>potential comorbidities or resistance</b>).
           For example, children are a lot less likely to develop severe symptoms, and inversely older are more likely to develop severe symptoms.
           Use the right part to characterize contacts between populations (quantity, duration and level of infection control).
           For example, infection control of children during visits could be lower than with professionals."
         ),
         h4("Test-related parameters"),
         HTML(
-        "In this tab, use the left part to inform mwss about the used test (specificity, sensibility, duration and and targeted population).
+        "In this tab, use the left part to inform mwss about the used test (specificity, sensibility, duration and targeted population).
         Two type of tests are proposed:
         <ol>
         <li>antigen detection rapid diagnostic test (Ag-RDT), and</li>
         <li>real-time reverse transcription polymerase chain reaction assay (RT-PCR).</li>
         </ol>
         In essence, both type of test being define by their specificity, sensibility and duration, it can be any type test,
-        nevertheless, in its stage of developpement, mwss only provides the possibility of discriminating two types of tests
+        nevertheless, in its stage of developement, mwss only provides the possibility of discriminating two types of tests
         used either for patient or professional screening, or for symptomatic patients confirmation.
         <br>
         Use the right side of the tab to inform on the detection/reaction time in case of symptoms for both patients and professionals.
@@ -85,19 +85,19 @@ tabItemParams <- function() {
           "
           MWSS considers three immunity levels:
         <ol>
-        <li> individuals without any immunity (neither vaccinated nor recovered), </li>
-        <li> individuals with a low immunity level (considering either an old vaccin injection or recovery), and </li>
-        <li> individuals with a high immunity level (considering either a recent vaccin injection or recovery). </li>
+        <li> individuals without any immunity (neither vaccinated nor recovered: NI), </li>
+        <li> individuals with a low immunity level (considering either an old vaccine injection or recovery: LI), and </li>
+        <li> individuals with a high immunity level (considering either a recent vaccine injection or recovery: HI). </li>
         </ol>
         <br>
-        Those three levels of immunity impact the probabilities of contacting the disease, and developping both mild and severe symptoms.
+        Those three levels of immunity impact the probabilities of contacting the disease, and developing both mild and severe symptoms.
         <br>
           By default, all patients and professionals are considered as fully susceptible (neither vaccinated nor recovered).
           In this tab, you can specify the initial immunity state of your population.
           Your population will be randomly sampled based on probability weights define for each immunity level.
           You can choose to use national proportion as probabilities, or set you own probability.
           You can also choose to use different probabilities for different wards (for example,
-          you may face different immunity populations in a pediatric ward and in a psychiatric ward).
+          you may face different immunity populations in a paediatric ward and in a psychiatric ward).
           "
         ),
         h4("Expert corner"),
@@ -106,13 +106,19 @@ tabItemParams <- function() {
           This tab is mainly reserved to epidemiologists, nevertheless if you want to take your chance here, you have access to all the model parameters.
           <br>
           Using this tab, you can change the daily incidence, the basic reproduction number (R0) and the average disease duration.
-          Those paramaters will affect the probability of contamination of professionals in the community (outside of work), as well as
+          Those parameters will affect the probability of contamination of professionals in the community (outside of work), as well as
           the probability to receive a infectious visitor.
           You can also adjust the national proportions and duration of each immunity and epidemiological stages,
           as well as the probability of receiving a vaccination dose.
           Finally, you can adjust the immunity efficiency.
+          Epidemiological stages considered in this model are: susceptible (S), exposed but non contagious (E), exposed and contagious either before symptoms (ES) or before asymptomatic stage (EA), infectious either asymptomatic (IA), with mild symptoms (IM) or with severe symptoms (IS).
           "
-        )
+        ),
+        br(),
+        br(),
+        img(src = 'compartmentalModel-epid.png',
+            title = "Multilevel compartmental model",
+            width = "100%")
       ),
       tabPanel(
         title = "Epidemiological parameters",

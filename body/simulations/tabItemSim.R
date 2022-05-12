@@ -12,7 +12,41 @@ tabItemSim <- function() {
             tabPanel(
               title = "How to use",
               icon = icon("question-circle"),
-              strong("Introduction")
+              h3("Simulation panel"),
+              HTML(
+                "In this panel, you can run various surveillance and control scenarios to assess their impact on the disease spread."
+              ),
+              h3("Surveillance and control"),
+              HTML(
+                "At this stage of development, the following measures have been implemented:
+                  <ol>
+                    <li>contact restriction for patients with positive test (ISO compartment at the subpopulation level). You can adjust the average duration of this restriction.</li>
+                    <li>regular screening in patient and/or professionals populations. You can adjust the frequency of test-screening events, as well as the targeted population and subpopulation (immunity-based).</li>
+                    <li>systematic screening of patients at the admission. This measure implies the absence of contact with most of the professionals and all patients before test result. You can adjust the various parameters such as the type of test used, the level of infection control in patient/professional interactions, etc.</li>
+                  </ol>"
+              ),
+              h3("Simulation parameters"),
+              HTML(
+                "You can define the duration of the simulation (days) and the number of simulations before running the model.
+                The number of simulations should be defined as a tradeoff between running time and standard deviation of the output.
+                During a run, any click is prevented by the app.
+                Once you clicked the \"Run\" button, be patient, simulations can take time.
+                Do not close the window."
+              ),
+              h3("Simulation output"),
+              HTML(
+                "Various output are proposed.
+                You can download a synthetic report and raw data ready to be imported and explore in R.
+                All figures are editable and downloadable either in png of pdf.
+                "
+              ),
+              br(),
+              br(),
+              img(
+                src = 'compartmentalModel.png',
+                title = "Multilevel compartmental model",
+                width = "70%"
+              )
             ),
             tabPanel(
               title = "Simulations",
@@ -317,10 +351,8 @@ tabItemSim <- function() {
                   # display load spinner when shiny is busy
                   conditionalPanel(
                     condition = "$(\'html\').hasClass(\'shiny-busy\')",
-                    tags$div(
-                      "Simulation in progress. This may take a while...",
-                      id = "loadmessage"
-                    ),
+                    tags$div("Simulation in progress. This may take a while...",
+                             id = "loadmessage"),
                     tags$div(class = "loader"),
                     tags$div(class = "prevent_click")
                   )

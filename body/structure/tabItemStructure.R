@@ -49,7 +49,7 @@ tabItemStructure <- function() {
                 Contact network, responsible for disease introduction and spread in healthcare facilities, implies
                 several subpopulations: medical staff, patients and visitors, potentially structured in subgroups such as:  departments, wards, and rooms.
                 In the frame of evaluating nosocomial transmission of Sars-CoV-2 in healthcare facilities,
-                MWSS considers direct transmission routes through effective contacts among thoses populations structured in wards.
+                MWSS considers direct transmission routes through effective contacts among those populations structured in wards.
                 Healthcare workers can be contaminated either at work: by infectious patients or infectious professionals, or in community.
                 Patients can be contaminated by infectious patients and professionals but also by infectious visitors."
               ),
@@ -65,7 +65,7 @@ tabItemStructure <- function() {
                 In the <b>'General structure'</b> box, use buttons to add, edit or delete wards from your system.
                 For each ward, the system requires a unique name, a number of patients (beds/capacity), a number of professionals,
                 the average length of stay of patients (in days) and the average daily number of visitors.
-                When wards are added to the system, they appear in they 'Connectivity' network plot (the size of the node being
+                When wards are added to the system, they appear in the 'Connectivity' network plot (the size of the node being
                 the total population size including both patients and professionals) and professionals are added to the
                 <b>'Health care workers shared time'</b> table assuming full time (100%) in the associated ward."
               ),
@@ -73,9 +73,9 @@ tabItemStructure <- function() {
               HTML(
                 "The time spent by professionals into each ward can be adjusted using the 'Modify time distribution' button.
                 Total working time of a professional can be more or less than 100%,
-                nevertheless the `total` column will be highlighting those particular cases respectively in red and green to avoid mistack.
+                nevertheless the `total` column will be highlighting those particular cases respectively in red and green to avoid mistake.
                 When professionals are spending time in multiple wards, it creates a connection between
-                those wards that will grahically appears on the connectivity network plot.
+                those wards that will graphically appears on the connectivity network plot.
                 "
               ),
               h3("Save you structure"),
@@ -86,7 +86,12 @@ tabItemStructure <- function() {
                 "
               ),
               h3("No copy of your entries is saved anywhere, neither on the cloud nor on our servers, remember to download it locally for
-                     later use.")
+                     later use."),
+              br(),
+              br(),
+              img(src = 'compartmentalModel-structure.png',
+                  title = "Multilevel compartmental model",
+                  width = "80%")
             ),
             tabPanel(
               title = "Structure",
