@@ -34,8 +34,8 @@ body <- dashboardBody(
   border:16px solid #999999;
   border-top: 16px solid #8B0000;
   border-radius: 50%;
-  width: 300px;
-  height: 300px;
+  width: 150px;
+  height: 150px;
   top:45%;
   left:45%;
   animation: spin 2s linear infinite;

@@ -332,6 +332,11 @@ tabItemSim <- function() {
                   # ),
                   conditionalPanel(
                     "output.atleastoneward == true",
+                    conditionalPanel(
+                      condition = "$(\'html\').hasClass(\'shiny-busy\')",
+                      # tags$div(class = "loader"),
+                      tags$div(class = "prevent_click")
+                    ),
                     actionButton(
                       "runmodel",
                       "Run",
@@ -352,9 +357,7 @@ tabItemSim <- function() {
                   conditionalPanel(
                     condition = "$(\'html\').hasClass(\'shiny-busy\')",
                     tags$div("Simulation in progress. This may take a while...",
-                             id = "loadmessage"),
-                    tags$div(class = "loader"),
-                    tags$div(class = "prevent_click")
+                             id = "loadmessage")
                   )
                 )
               ),
