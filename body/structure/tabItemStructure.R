@@ -36,6 +36,11 @@ tabItemStructure <- function() {
                   resetreactivesUI("resetall")
                 )
               ),
+              div(
+                style = "display: inline-block;vertical-align:top;",
+                br(),
+                loadTestdtUI("loadtest")
+              ),
               hr()
             ),
             tabPanel(

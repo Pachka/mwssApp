@@ -42,8 +42,6 @@ uploadParams  <- function(input, output, session, gdata){
                    req(input$loadparams)
 
                    load(input$loadparams$datapath)
-
-
                  }
                }, ignoreNULL = FALSE)
 

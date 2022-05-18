@@ -29,6 +29,8 @@ source('functions/plotsoutputModule.R', local = TRUE)
 source('functions/resetreactivesModule.R', local = TRUE)
 source('functions/synthreportModule.R', local = TRUE)
 source('functions/exporttrajModule.R', local = TRUE)
+source('functions/loadTestdtModule.R', local = TRUE)
+
 
 
 # App Structure function

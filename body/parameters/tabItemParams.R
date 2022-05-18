@@ -233,9 +233,7 @@ tabItemParams <- function() {
                   icon = "exclamation-triangle",
                   colour = "orange",
                   type = "inline",
-                  content = paste(
-                    "For the professionals, the percent probabilities are currently set at ... % for non immune, ... % for individuals with old vaccination or infection history and ... % for those with recent vaccination or infection history."
-                  ) # FIX ME give an example
+                  content = textOutput("rsympInfo")
                 ),
                 helper(
                   numericInput(
@@ -251,8 +249,8 @@ tabItemParams <- function() {
                   colour = "orange",
                   type = "inline",
                   content = paste(
-                    "For the professionals, the percent probabilities are currently set at ... % for non immune, ... % for individuals with old vaccination or infection history and ... % for those with recent vaccination or infection history."
-                  ) # FIX ME give an example
+                    textOutput("rsevInfo")
+                    ) # FIX ME give an example
                 )
               )
             )

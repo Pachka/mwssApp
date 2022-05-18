@@ -31,6 +31,11 @@ server <- function(input, output, session) {
     gdata = NULL
   )
 
+  # load test
+  callModule(module = loadTestdt,
+             id = "loadtest",
+             variable = data)
+
 # reset inputs
   callModule(module = resetreactives,
              id = "resetall",
@@ -42,7 +47,7 @@ server <- function(input, output, session) {
     contacts <- data$Hplanning
 
     matContact <- lapply(data$ward_names, function(W) {
-      W <- contacts[endsWith(contacts$professionals, paste0("_", W)), ]
+      W <- contacts$professionals %>% endsWith(., paste0("_", W)) %>% contacts[., ]
       W %<>% .[, mget(c(names(.)[names(.) != "professionals"]))] %>% colSums
       W %<>% divide_by(sum(.)) %>% multiply_by((100))
       W
@@ -253,6 +258,9 @@ server <- function(input, output, session) {
 
     if (num_nodes > 1) {
 
+      print(data$matContact)
+      print(data$pop_size_P)
+      print(data$pop_size_H)
       plot_connectivity(
         data$matContact,
         as.numeric(data$pop_size_P) + as.numeric(data$pop_size_H),
@@ -816,6 +824,30 @@ server <- function(input, output, session) {
     },
     ignoreNULL = FALSE
   )
+
+  ## Helpers for patient ratios
+
+  output$rsympInfo <- renderText({
+    c(
+      "For the professionals, the percent probabilities to develop symptoms are currently set at",
+      input$psympNI * 100,"% for non immune,",
+      input$psympLI * 100,"% for individuals with old vaccination or infection history and",
+      input$psympHI * 100,"% for those with recent vaccination or infection history. \n \n
+      With a ratio of 0.5, those probabilities for the patients will respectivelly be:",
+      input$psympNI * 100 * 0.5,"%,",input$psympLI * 100 * 0.5,"% and",input$psympHI * 100 * 0.5, "%."
+    )
+  })
+
+  output$rsevInfo <- renderText({
+    c(
+      "For the professionals, the contional percent probabilities to develop severe symptoms when symptomatic are currently set at",
+      input$psevNI * 100,"% for non immune,",
+      input$psevLI * 100,"% for individuals with old vaccination or infection history and",
+      input$psevHI * 100,"% for those with recent vaccination or infection history. \n \n
+      With a ratio of 0.5, those probabilities for the patients will respectivelly be:",
+      input$psevNI * 100 * 0.5,"%,",input$psevLI * 100 * 0.5,"% and",input$psevHI * 100 * 0.5, "%."
+    )
+  })
 
   ## Set ImmState
 

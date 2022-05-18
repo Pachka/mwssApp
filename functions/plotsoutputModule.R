@@ -81,7 +81,28 @@ plotsoutputUI <- function(id) {
             min = 0.1,
             max = 1,
             step = 0.1
-          )
+          ),
+          conditionalPanel(
+            condition =
+              paste0('input[\'', ns('formatP1'), "\'] == \"png\""),
+            column(6,
+            sliderInput(
+              ns('widthP1'),
+              'Width (px):',
+              value = 1500,
+              min = 500,
+              max = 2000,
+              step = 50
+            )),
+            column(6,
+            sliderInput(
+              ns('heightP1'),
+              'Height (px):',
+              value = 1100,
+              min = 500,
+              max = 2000,
+              step = 50
+            )))
         ),
         radioButtons(
           inputId = ns("formatP1"),
@@ -165,7 +186,28 @@ plotsoutputUI <- function(id) {
             min = 0.1,
             max = 1,
             step = 0.1
-          )
+          ),
+          conditionalPanel(
+            condition =
+              paste0('input[\'', ns('formatP2'), "\'] == \"png\""),
+            column(6,
+                   sliderInput(
+                     ns('widthP2'),
+                     'Width (px):',
+                     value = 1500,
+                     min = 500,
+                     max = 2000,
+                     step = 50
+                   )),
+            column(6,
+                   sliderInput(
+                     ns('heightP2'),
+                     'Height (px):',
+                     value = 1100,
+                     min = 500,
+                     max = 2000,
+                     step = 50
+                   )))
         ),
         radioButtons(
           inputId = ns("formatP2"),
@@ -360,7 +402,10 @@ plotsoutput <-
       # content is a function with argument file. content writes the plot to the device
       content = function(file) {
         if (input$formatP1 == "png")
-          png(file, res = 150) # open the png device
+          png(file, res = 150,
+              width = input$widthP1,
+              height = input$heightP1
+              ) # open the png device
         else
           pdf(file) # open the pdf device
 
@@ -407,7 +452,9 @@ plotsoutput <-
       # content is a function with argument file. content writes the plot to the device
       content = function(file) {
         if (input$formatP2 == "png")
-          png(file) # open the png device
+          png(file, res = 150,
+              width = input$widthP2,
+              height = input$heightP2) # open the png device
         else
           pdf(file) # open the pdf device
 
