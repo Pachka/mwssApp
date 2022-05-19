@@ -64,16 +64,6 @@ tabItemSim <- function() {
                     )
                   )
                 ),
-                conditionalPanel(condition = "input.CSprotocols.includes('ISO')",
-                                 box(
-                                   numericInput(
-                                     'tISO',
-                                     'Average duration of confinement (days)',
-                                     value = 7,
-                                     min = 0.5,
-                                     step = 0.5
-                                   )
-                                 )),
                 conditionalPanel(condition = "input.CSprotocols.includes('regscreen')",
                                  box(
                                    checkboxGroupInput(

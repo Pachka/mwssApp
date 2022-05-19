@@ -257,10 +257,6 @@ server <- function(input, output, session) {
     }
 
     if (num_nodes > 1) {
-
-      print(data$matContact)
-      print(data$pop_size_P)
-      print(data$pop_size_H)
       plot_connectivity(
         data$matContact,
         as.numeric(data$pop_size_P) + as.numeric(data$pop_size_H),
@@ -539,8 +535,6 @@ server <- function(input, output, session) {
       # https://www.gouvernement.fr/info-coronavirus/carte-et-donnees
       tSA = input$tSA,
       # average duration before full admission (in screening area for clinical exam, administrative procedure, etc)
-      tISO = input$tISO,
-      # average duration of confinement (isolated ward or contact restriction)
       tIC = input$tIC,
       # average duration of stay in intensive care
       tSLs = input$tSLs,
@@ -774,7 +768,6 @@ server <- function(input, output, session) {
             "I",
             "d",
             "R0",
-            "tISO",
             "tIC",
             "tE",
             "tEA",
@@ -1081,8 +1074,8 @@ server <- function(input, output, session) {
 
 
     pISO <- ifelse('ISO' %in% input$CSprotocols,
-                   1,
-                   0)
+                   TRUE,
+                   FALSE)
 
     gdata <- build_gdata(
       ##### Infection
@@ -1132,8 +1125,6 @@ server <- function(input, output, session) {
       tSA  = (as.numeric(strftime(input$tSA, "%M")) / 60 + as.numeric(strftime(input$tSA, "%H"))) /
         24,
       # average duration before full admission (in screening area for clinical exam, administrative procedure, etc)
-      tISO = input$tISO,
-      # average duration of confinement (isolated ward or contact restriction)
       tIC  = input$tIC,
       # average duration of stay in intensive care
       tSL  = input$tSLs[1],
@@ -1345,7 +1336,7 @@ server <- function(input, output, session) {
   })
 
   output$simoutput <- reactive({
-    return(class(runmodel()) == "mwss")
+    return("mwss" %in% class(runmodel()))
   })
 
   outputOptions(output,

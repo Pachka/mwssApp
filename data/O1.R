@@ -18,7 +18,6 @@ d = 10,
 #  basic reproduction number
 R0 = 1.29, # https://www.gouvernement.fr/info-coronavirus/carte-et-donnees
 # tSA  = strptime("02:00", "%R"), # average duration before full admission (in screening area for clinical exam, administrative procedure, etc)
-tISO = 11,   # average duration of confinement (isolated ward or contact restriction)
 tIC  = 15,   # average duration of stay in intensive care
 tSL  = 14,   # average duration of sick leave
 tESL = 28,   # average duration of extended sick leave

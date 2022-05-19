@@ -56,7 +56,7 @@ updateParams  <- function(input, output, session){
 
                        # update numeric input values
                        for(numInput in c("I", "d", "R0",
-                                         "tISO", "tIC",
+                                         "tIC",
                                          "tE", "tEA", "tES", "tIA", "tIM", "tIS", "tLI","tHI",
                                          "rsymp", "rsev",
                                          "sensAg", "speAg", "sensPCR", "spePCR"))
