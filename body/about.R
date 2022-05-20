@@ -15,7 +15,7 @@ tabItemAbout <- function(){
     ### Authors
     Hammami Pachka (1,2), Oodally Ajmal (1,2), Laura Temime (3), Lulla Opatowski (2)
 
-    1. Université de Versailles Saint-Quentin-en-Yvelines, membre associé de l'Université Paris-Saclay
+    1. Universite de Versailles Saint-Quentin-en-Yvelines, membre associe de l'Universite Paris-Saclay
     2. Institut Pasteur
     3. Conservatoire national des arts et metiers
 
